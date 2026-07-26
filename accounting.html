@@ -16,39 +16,40 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 20px; line-height: 1.5; }
-    .container { max-width: 900px; margin: 0 auto; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 16px; line-height: 1.5; }
+    .container { max-width: 950px; margin: 0 auto; }
     
-    h1 { font-size: 1.5rem; margin-bottom: 20px; color: var(--primary-color); }
-    h2 { font-size: 1.2rem; margin-bottom: 12px; }
+    h1 { font-size: 1.5rem; margin-bottom: 16px; color: var(--primary-color); }
+    h2 { font-size: 1.1rem; margin-bottom: 12px; }
     
     /* ダッシュボード */
-    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 24px; }
+    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
     .card { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .card-title { font-size: 0.85rem; color: #64748b; margin-bottom: 4px; }
     .card-value { font-size: 1.4rem; font-weight: bold; }
     .card-value.plus { color: var(--success-color); }
     .card-value.minus { color: var(--danger-color); }
 
-    /* 入力フォーム & 設定 */
-    .section { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 24px; }
+    /* セクション & フォーム */
+    .section { background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; }
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; }
     input, select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; }
     .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
     /* ボタン */
-    .btn-group { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
-    button { padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; font-size: 0.9rem; }
+    .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    button { padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; font-size: 0.88rem; }
     button:hover { opacity: 0.9; }
     button.secondary { background: #64748b; }
     button.outline { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
     button.danger { background: var(--danger-color); }
+    button.sm { padding: 4px 8px; font-size: 0.75rem; }
 
     /* テーブル */
     .table-container { overflow-x: auto; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9rem; }
-    th, td { border-bottom: 1px solid var(--border-color); padding: 10px; text-align: left; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
+    th, td { border-bottom: 1px solid var(--border-color); padding: 8px 10px; text-align: left; }
     th { background: #f1f5f9; font-weight: 600; }
     .type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
     .type-fee { background: #dbeafe; color: #1e40af; }
@@ -56,11 +57,25 @@
     .type-purchase { background: #fce7f3; color: #9d174d; }
 
     /* ナビゲーションタブ */
-    .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; }
-    .tab { padding: 10px 20px; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; }
+    .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; overflow-x: auto; }
+    .tab { padding: 10px 16px; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; font-size: 0.9rem; }
     .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
+
+    /* メンバーリストタグ */
+    .member-tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .member-tag { background: #e2e8f0; padding: 4px 10px; border-radius: 16px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
+    .member-tag .remove-btn { cursor: pointer; color: var(--danger-color); font-weight: bold; }
+
+    /* カレンダー */
+    .calendar-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    .calendar-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px; text-align: center; }
+    .cal-day-head { font-size: 0.8rem; font-weight: bold; color: #64748b; padding: 4px 0; }
+    .cal-cell { background: #f8fafc; border: 1px solid var(--border-color); border-radius: 4px; min-height: 52px; padding: 4px; font-size: 0.8rem; position: relative; cursor: pointer; }
+    .cal-cell:hover { background: #f1f5f9; }
+    .cal-cell .day-num { font-weight: bold; text-align: left; }
+    .cal-event-dot { background: var(--primary-color); color: white; border-radius: 4px; font-size: 0.7rem; padding: 2px 4px; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   </style>
 </head>
 <body>
@@ -68,48 +83,83 @@
 <div class="container">
   <h1>イベント会計管理</h1>
 
-  <!-- 全体サマリー -->
+  <!-- サマリー -->
   <div class="dashboard">
     <div class="card">
-      <div class="card-title">繰越金（事前収支）</div>
+      <div class="card-title">繰越金（初期残高）</div>
       <input type="number" id="initialBalance" value="0" onchange="updateCalculations()" style="font-weight:bold;">
     </div>
     <div class="card">
-      <div class="card-title">本日のイベント収支</div>
-      <div id="todayBalance" class="card-value">¥0</div>
+      <div class="card-title">全イベント累計収支</div>
+      <div id="allEventsBalance" class="card-value">¥0</div>
     </div>
     <div class="card">
-      <div class="card-title">最終合計収支</div>
+      <div class="card-title">最終合計残高</div>
       <div id="totalBalance" class="card-value">¥0</div>
     </div>
   </div>
 
   <!-- タブ切替 -->
   <div class="tabs">
-    <div class="tab active" onclick="switchTab('entryView')">明細入力・一覧</div>
-    <div class="tab" onclick="switchTab('summaryView')">メンバー別 精算一覧</div>
+    <div class="tab active" onclick="switchTab('calendarView')">カレンダー・イベント</div>
+    <div class="tab" onclick="switchTab('entryView')">明細入力</div>
+    <div class="tab" onclick="switchTab('summaryView')">メンバー別精算</div>
+    <div class="tab" onclick="switchTab('eventStatsView')">イベント別収支記録</div>
+    <div class="tab" onclick="switchTab('memberMasterView')">メンバーマスター登録</div>
   </div>
 
-  <!-- タブ1: 明細入力と一覧 -->
-  <div id="entryView" class="tab-content active">
+  <!-- タブ1: カレンダー & イベント選択 -->
+  <div id="calendarView" class="tab-content active">
     <div class="section">
-      <h2>新規明細の追加</h2>
+      <div class="calendar-header">
+        <button class="secondary sm" onclick="changeMonth(-1)">&lt; 前月</button>
+        <h2 id="calendarTitle">2026年 7月</h2>
+        <button class="secondary sm" onclick="changeMonth(1)">翌月 &gt;</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+
+    <div class="section">
+      <h2>新しいイベントの作成</h2>
+      <form onsubmit="createEvent(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <label>イベント名</label>
+            <input type="text" id="newEventName" placeholder="例: 富士ヒルクライム" required>
+          </div>
+          <div class="form-group">
+            <label>開催日付</label>
+            <input type="date" id="newEventDate" required>
+          </div>
+        </div>
+        <button type="submit">イベントを追加</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- タブ2: 明細入力 -->
+  <div id="entryView" class="tab-content">
+    <div class="section">
+      <div class="form-group" style="max-width: 300px;">
+        <label>対象イベントを選択</label>
+        <select id="activeEventSelect" onchange="onActiveEventChange()"></select>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>明細の追加</h2>
       <form id="accountingForm" onsubmit="addEntry(event)">
         <div class="form-row">
           <div class="form-group">
-            <label>日付</label>
-            <input type="date" id="entryDate" required>
-          </div>
-          <div class="form-group">
             <label>メンバー名</label>
-            <input type="text" id="memberName" placeholder="例: 山田 太郎" required>
+            <select id="entryMemberSelect" required></select>
           </div>
           <div class="form-group">
             <label>区分</label>
             <select id="entryType">
               <option value="参加費用">参加費用 (収入)</option>
               <option value="駐車場代">駐車場代 (収入)</option>
-              <option value="購入物支給">購入物代・立替 (支出)</option>
+              <option value="購入物支給">購入物・立替費 (支出)</option>
             </select>
           </div>
           <div class="form-group">
@@ -119,7 +169,7 @@
         </div>
         <div class="form-group">
           <label>メモ / 品名</label>
-          <input type="text" id="entryMemo" placeholder="例: 飲み物代、A駐車場など">
+          <input type="text" id="entryMemo" placeholder="例: エントリー費、駐車場代、補給食代">
         </div>
         <button type="submit">追加する</button>
       </form>
@@ -127,14 +177,13 @@
 
     <div class="section">
       <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2>登録済み明細</h2>
-        <button class="outline" onclick="exportCSV()">CSV出力</button>
+        <h2>このイベントの明細一覧</h2>
+        <button class="outline sm" onclick="exportCSV()">CSV出力</button>
       </div>
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>日付</th>
               <th>メンバー</th>
               <th>区分</th>
               <th>メモ</th>
@@ -142,19 +191,19 @@
               <th>操作</th>
             </tr>
           </thead>
-          <tbody id="entriesTableBody">
-            <!-- 動的追加 -->
-          </tbody>
+          <tbody id="entriesTableBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- タブ2: メンバー別集計表示 -->
+  <!-- タブ3: メンバー別精算一覧 -->
   <div id="summaryView" class="tab-content">
     <div class="section">
-      <h2>メンバーごとの収支状況</h2>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※「受取予定」はイベント側が集金する額、「支払予定」はイベントからメンバーへ手渡す（清算する）額です。</p>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 id="summaryTitle">メンバー別精算一覧</h2>
+      </div>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※プラスはイベント側の徴収額、マイナス（払）はイベントからメンバーへお渡し・精算する額です。</p>
       <div class="table-container">
         <table>
           <thead>
@@ -162,138 +211,335 @@
               <th>メンバー名</th>
               <th>参加費</th>
               <th>駐車場代</th>
-              <th>購入物・立替費</th>
+              <th>購入物・立替</th>
               <th>差引 清算額</th>
             </tr>
           </thead>
-          <tbody id="memberSummaryBody">
-            <!-- 動的追加 -->
-          </tbody>
+          <tbody id="memberSummaryBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
+  <!-- タブ4: イベント別収支記録 -->
+  <div id="eventStatsView" class="tab-content">
+    <div class="section">
+      <h2>イベント別 収支一覧</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>イベント名</th>
+              <th>収入合計</th>
+              <th>支出合計</th>
+              <th>イベント収支</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="eventStatsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブ5: メンバーマスター登録 -->
+  <div id="memberMasterView" class="tab-content">
+    <div class="section">
+      <h2>メンバーの登録・削除</h2>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※ここで登録したメンバーが今後のイベント精算に自動で引き継がれます。</p>
+      <form onsubmit="addMasterMember(event)">
+        <div class="form-row">
+          <div class="form-group">
+            <input type="text" id="newMemberName" placeholder="例: 関川 太郎" required>
+          </div>
+          <div class="form-group">
+            <button type="submit">メンバーを追加</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="member-tag-list" id="memberTagList"></div>
+    </div>
+  </div>
+
   <div style="text-align: right; margin-top: 20px;">
-    <button class="danger" onclick="clearAllData()">全データをリセット</button>
+    <button class="danger sm" onclick="clearAllData()">全データを初期化</button>
   </div>
 </div>
 
 <script>
-  let entries = JSON.parse(localStorage.getItem('event_accounting_entries')) || [];
-  
-  // 初期化
+  let state = {
+    initialBalance: 0,
+    members: ['関川 太郎', '佐藤 健', '鈴木 花子'],
+    events: [], // { id, name, date }
+    entries: [], // { id, eventId, memberName, type, amount, memo }
+    currentEventId: null,
+    calYear: new Date().getFullYear(),
+    calMonth: new Date().getMonth()
+  };
+
   document.addEventListener('DOMContentLoaded', () => {
-    document.getElementById('entryDate').valueAsDate = new Date();
-    const savedInitial = localStorage.getItem('event_accounting_initial');
-    if (savedInitial) {
-      document.getElementById('initialBalance').value = savedInitial;
-    }
-    render();
+    loadData();
+    renderAll();
   });
 
-  // タブ切り替え
+  function saveData() {
+    localStorage.setItem('event_accounting_v2', JSON.stringify(state));
+  }
+
+  function loadData() {
+    const saved = localStorage.setItem ? localStorage.getItem('event_accounting_v2') : null;
+    if (saved) {
+      state = Object.assign(state, JSON.parse(saved));
+    } else {
+      // 初期サンプルイベント
+      state.events.push({ id: 'e1', name: 'サンプル走行会', date: new Date().toISOString().slice(0,10) });
+      state.currentEventId = 'e1';
+    }
+    document.getElementById('initialBalance').value = state.initialBalance;
+  }
+
   function switchTab(tabId) {
     document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
     
-    event.target.classList.add('active');
+    const activeTab = Array.from(document.querySelectorAll('.tab')).find(t => t.getAttribute('onclick').includes(tabId));
+    if (activeTab) activeTab.classList.add('active');
     document.getElementById(tabId).classList.add('active');
+
+    renderAll();
   }
 
-  // データの追加
+  function renderAll() {
+    renderCalendar();
+    renderEventSelect();
+    renderEntries();
+    renderMemberSummary();
+    renderEventStats();
+    renderMemberMaster();
+    updateCalculations();
+  }
+
+  /* --- メンバーマスター --- */
+  function addMasterMember(e) {
+    e.preventDefault();
+    const input = document.getElementById('newMemberName');
+    const name = input.value.trim();
+    if (name && !state.members.includes(name)) {
+      state.members.push(name);
+      input.value = '';
+      saveData();
+      renderAll();
+    }
+  }
+
+  function removeMasterMember(name) {
+    if (confirm(`${name} さんを登録一覧から削除しますか？`)) {
+      state.members = state.members.filter(m => m !== name);
+      saveData();
+      renderAll();
+    }
+  }
+
+  function renderMemberMaster() {
+    const container = document.getElementById('memberTagList');
+    container.innerHTML = '';
+    state.members.forEach(m => {
+      const tag = document.createElement('div');
+      tag.className = 'member-tag';
+      tag.innerHTML = `<span>${escapeHtml(m)}</span><span class="remove-btn" onclick="removeMasterMember('${escapeHtml(m)}')">&times;</span>`;
+      container.appendChild(tag);
+    });
+  }
+
+  /* --- イベント管理 & カレンダー --- */
+  function createEvent(e) {
+    e.preventDefault();
+    const name = document.getElementById('newEventName').value.trim();
+    const date = document.getElementById('newEventDate').value;
+    const newId = 'e_' + Date.now();
+    state.events.push({ id: newId, name, date });
+    state.currentEventId = newId;
+    saveData();
+    
+    document.getElementById('newEventName').value = '';
+    switchTab('entryView');
+  }
+
+  function deleteEvent(id) {
+    if (confirm('このイベントと関連するすべての明細を削除しますか？')) {
+      state.events = state.events.filter(e => e.id !== id);
+      state.entries = state.entries.filter(e => e.eventId !== id);
+      if (state.currentEventId === id) {
+        state.currentEventId = state.events.length ? state.events[0].id : null;
+      }
+      saveData();
+      renderAll();
+    }
+  }
+
+  function changeMonth(diff) {
+    state.calMonth += diff;
+    if (state.calMonth < 0) { state.calMonth = 11; state.calYear--; }
+    if (state.calMonth > 11) { state.calMonth = 0; state.calYear++; }
+    renderCalendar();
+  }
+
+  function renderCalendar() {
+    const title = document.getElementById('calendarTitle');
+    title.textContent = `${state.calYear}年 ${state.calMonth + 1}月`;
+
+    const grid = document.getElementById('calendarGrid');
+    grid.innerHTML = '';
+
+    const heads = ['日', '月', '火', '水', '木', '金', '土'];
+    heads.forEach(h => {
+      const div = document.createElement('div');
+      div.className = 'cal-day-head';
+      div.textContent = h;
+      grid.appendChild(div);
+    });
+
+    const firstDay = new Date(state.calYear, state.calMonth, 1).getDay();
+    const daysInMonth = new Date(state.calYear, state.calMonth + 1, 0).getDate();
+
+    for (let i = 0; i < firstDay; i++) {
+      grid.appendChild(document.createElement('div'));
+    }
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cell = document.createElement('div');
+      cell.className = 'cal-cell';
+      const dateStr = `${state.calYear}-${String(state.calMonth + 1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      
+      cell.innerHTML = `<div class="day-num">${d}</div>`;
+      
+      const dayEvents = state.events.filter(e => e.date === dateStr);
+      dayEvents.forEach(e => {
+        const evDiv = document.createElement('div');
+        evDiv.className = 'cal-event-dot';
+        evDiv.textContent = e.name;
+        evDiv.onclick = (ev) => {
+          ev.stopPropagation();
+          state.currentEventId = e.id;
+          switchTab('summaryView');
+        };
+        cell.appendChild(evDiv);
+      });
+
+      grid.appendChild(cell);
+    }
+  }
+
+  function renderEventSelect() {
+    const sel = document.getElementById('activeEventSelect');
+    sel.innerHTML = '';
+    state.events.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(e => {
+      const opt = document.createElement('option');
+      opt.value = e.id;
+      opt.textContent = `${e.date} : ${e.name}`;
+      if (e.id === state.currentEventId) opt.selected = true;
+      sel.appendChild(opt);
+    });
+
+    const memSel = document.getElementById('entryMemberSelect');
+    memSel.innerHTML = '';
+    state.members.forEach(m => {
+      const opt = document.createElement('option');
+      opt.value = m;
+      opt.textContent = m;
+      memSel.appendChild(opt);
+    });
+  }
+
+  function onActiveEventChange() {
+    state.currentEventId = document.getElementById('activeEventSelect').value;
+    saveData();
+    renderAll();
+  }
+
+  /* --- 明細登録 & テーブル --- */
   function addEntry(e) {
     e.preventDefault();
+    if (!state.currentEventId) {
+      alert('先にイベントを作成または選択してください');
+      return;
+    }
     const entry = {
       id: Date.now(),
-      date: document.getElementById('entryDate').value,
-      name: document.getElementById('memberName').value.trim(),
+      eventId: state.currentEventId,
+      memberName: document.getElementById('entryMemberSelect').value,
       type: document.getElementById('entryType').value,
       amount: parseInt(document.getElementById('entryAmount').value, 10),
       memo: document.getElementById('entryMemo').value.trim()
     };
-
-    entries.push(entry);
-    saveAndRender();
-    document.getElementById('accountingForm').reset();
-    document.getElementById('entryDate').valueAsDate = new Date();
+    state.entries.push(entry);
+    saveData();
+    renderAll();
+    document.getElementById('entryAmount').value = '';
+    document.getElementById('entryMemo').value = '';
   }
 
-  // 明細削除
   function deleteEntry(id) {
-    entries = entries.filter(item => item.id !== id);
-    saveAndRender();
+    state.entries = state.entries.filter(e => e.id !== id);
+    saveData();
+    renderAll();
   }
 
-  // 保存と再描画
-  function saveAndRender() {
-    localStorage.setItem('event_accounting_entries', JSON.stringify(entries));
-    localStorage.setItem('event_accounting_initial', document.getElementById('initialBalance').value);
-    render();
-  }
-
-  // 再描画メイン関数
-  function render() {
-    renderTable();
-    renderMemberSummary();
-    updateCalculations();
-  }
-
-  // 明細テーブル描画
-  function renderTable() {
+  function renderEntries() {
     const tbody = document.getElementById('entriesTableBody');
     tbody.innerHTML = '';
 
-    entries.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(item => {
+    const eventEntries = state.entries.filter(e => e.eventId === state.currentEventId);
+    eventEntries.forEach(item => {
       const tr = document.createElement('tr');
       let badgeClass = 'type-fee';
       let amountSign = '+';
-      
       if (item.type === '駐車場代') badgeClass = 'type-parking';
-      if (item.type === '購入物支給') {
-        badgeClass = 'type-purchase';
-        amountSign = '-';
-      }
+      if (item.type === '購入物支給') { badgeClass = 'type-purchase'; amountSign = '-'; }
 
       tr.innerHTML = `
-        <td>${item.date}</td>
-        <td><strong>${escapeHtml(item.name)}</strong></td>
+        <td><strong>${escapeHtml(item.memberName)}</strong></td>
         <td><span class="type-badge ${badgeClass}">${item.type}</span></td>
         <td>${escapeHtml(item.memo || '-')}</td>
         <td style="font-weight:bold;">${amountSign}¥${item.amount.toLocaleString()}</td>
-        <td><button class="danger" style="padding: 2px 8px; font-size:0.75rem;" onclick="deleteEntry(${item.id})">削除</button></td>
+        <td><button class="danger sm" onclick="deleteEntry(${item.id})">削除</button></td>
       `;
       tbody.appendChild(tr);
     });
   }
 
-  // メンバー別集計テーブル描画
+  /* --- メンバー別精算集計 --- */
   function renderMemberSummary() {
+    const currentEvent = state.events.find(e => e.id === state.currentEventId);
+    const title = document.getElementById('summaryTitle');
+    title.textContent = currentEvent ? `精算一覧：${currentEvent.name} (${currentEvent.date})` : 'メンバー別精算一覧';
+
     const tbody = document.getElementById('memberSummaryBody');
     tbody.innerHTML = '';
 
     const summary = {};
+    state.members.forEach(m => summary[m] = { fee: 0, parking: 0, purchase: 0 });
 
-    entries.forEach(item => {
-      if (!summary[item.name]) {
-        summary[item.name] = { fee: 0, parking: 0, purchase: 0 };
-      }
-      if (item.type === '参加費用') summary[item.name].fee += item.amount;
-      if (item.type === '駐車場代') summary[item.name].parking += item.amount;
-      if (item.type === '購入物支給') summary[item.name].purchase += item.amount;
+    const eventEntries = state.entries.filter(e => e.eventId === state.currentEventId);
+    eventEntries.forEach(item => {
+      if (!summary[item.memberName]) summary[item.memberName] = { fee: 0, parking: 0, purchase: 0 };
+      if (item.type === '参加費用') summary[item.memberName].fee += item.amount;
+      if (item.type === '駐車場代') summary[item.memberName].parking += item.amount;
+      if (item.type === '購入物支給') summary[item.memberName].purchase += item.amount;
     });
 
     Object.keys(summary).forEach(name => {
       const data = summary[name];
-      const net = (data.fee + data.parking) - data.purchase; // 正なら回収、負なら払い出し
+      const net = (data.fee + data.parking) - data.purchase;
       const tr = document.createElement('tr');
-      
       tr.innerHTML = `
         <td><strong>${escapeHtml(name)}</strong></td>
         <td>¥${data.fee.toLocaleString()}</td>
         <td>¥${data.parking.toLocaleString()}</td>
         <td>¥${data.purchase.toLocaleString()}</td>
-        <td style="font-weight:bold; color: ${net >= 0 ? 'var(--text-color)' : 'var(--danger-color)'}">
+        <td style="font-weight:bold; color:${net >= 0 ? 'var(--text-color)' : 'var(--danger-color)'}">
           ${net >= 0 ? `徴収: ¥${net.toLocaleString()}` : `支払: ¥${Math.abs(net).toLocaleString()}`}
         </td>
       `;
@@ -301,65 +547,94 @@
     });
   }
 
-  // 収支の再計算
-  function updateCalculations() {
-    const initial = parseInt(document.getElementById('initialBalance').value, 10) || 0;
-    
-    let todayIncome = 0;
-    let todayExpense = 0;
+  /* --- イベント別収支記録 --- */
+  function renderEventStats() {
+    const tbody = document.getElementById('eventStatsBody');
+    tbody.innerHTML = '';
 
-    entries.forEach(item => {
-      if (item.type === '購入物支給') {
-        todayExpense += item.amount;
-      } else {
-        todayIncome += item.amount;
-      }
+    state.events.sort((a,b) => new Date(b.date) - new Date(a.date)).forEach(ev => {
+      const evEntries = state.entries.filter(e => e.eventId === ev.id);
+      let income = 0;
+      let expense = 0;
+      evEntries.forEach(e => {
+        if (e.type === '購入物支給') expense += e.amount;
+        else income += e.amount;
+      });
+      const net = income - expense;
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${ev.date}</td>
+        <td><strong>${escapeHtml(ev.name)}</strong></td>
+        <td>¥${income.toLocaleString()}</td>
+        <td>¥${expense.toLocaleString()}</td>
+        <td style="font-weight:bold; color:${net >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">¥${net.toLocaleString()}</td>
+        <td>
+          <button class="outline sm" onclick="selectAndSwitchEvent('${ev.id}')">開く</button>
+          <button class="danger sm" onclick="deleteEvent('${ev.id}')">削除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function selectAndSwitchEvent(id) {
+    state.currentEventId = id;
+    saveData();
+    switchTab('summaryView');
+  }
+
+  /* --- 全体計算 --- */
+  function updateCalculations() {
+    state.initialBalance = parseInt(document.getElementById('initialBalance').value, 10) || 0;
+    saveData();
+
+    let totalEventNet = 0;
+    state.entries.forEach(e => {
+      if (e.type === '購入物支給') totalEventNet -= e.amount;
+      else totalEventNet += e.amount;
     });
 
-    const todayBalance = todayIncome - todayExpense;
-    const totalBalance = initial + todayBalance;
+    const totalBalance = state.initialBalance + totalEventNet;
 
-    // 画面反映
-    const todayEl = document.getElementById('todayBalance');
-    todayEl.textContent = `¥${todayBalance.toLocaleString()}`;
-    todayEl.className = `card-value ${todayBalance >= 0 ? 'plus' : 'minus'}`;
+    const allEl = document.getElementById('allEventsBalance');
+    allEl.textContent = `¥${totalEventNet.toLocaleString()}`;
+    allEl.className = `card-value ${totalEventNet >= 0 ? 'plus' : 'minus'}`;
 
     const totalEl = document.getElementById('totalBalance');
     totalEl.textContent = `¥${totalBalance.toLocaleString()}`;
     totalEl.className = `card-value ${totalBalance >= 0 ? 'plus' : 'minus'}`;
-
-    localStorage.setItem('event_accounting_initial', initial);
   }
 
-  // CSVエクスポート
+  /* --- CSV --- */
   function exportCSV() {
-    if (entries.length === 0) {
-      alert('データがありません');
+    const currentEvent = state.events.find(e => e.id === state.currentEventId);
+    const evEntries = state.entries.filter(e => e.eventId === state.currentEventId);
+    if (!currentEvent || evEntries.length === 0) {
+      alert('出力するデータがありません');
       return;
     }
-    let csvStr = '日付,メンバー名,区分,メモ,金額\n';
-    entries.forEach(e => {
-      csvStr += `"${e.date}","${e.name}","${e.type}","${e.memo || ''}",${e.amount}\n`;
+    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\nメンバー名,区分,メモ,金額\n`;
+    evEntries.forEach(e => {
+      csvStr += `"${e.memberName}","${e.type}","${e.memo || ''}",${e.amount}\n`;
     });
 
     const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);
-    link.download = `event_accounting_${new Date().toISOString().slice(0,10)}.csv`;
+    link.download = `精算_${currentEvent.name}_${currentEvent.date}.csv`;
     link.click();
   }
 
-  // 全リセット
   function clearAllData() {
-    if (confirm('すべての登録データを削除しますか？')) {
-      entries = [];
-      localStorage.removeItem('event_accounting_entries');
-      saveAndRender();
+    if (confirm('すべてのデータ（イベント、メンバー、明細）を初期化しますか？')) {
+      localStorage.removeItem('event_accounting_v2');
+      location.reload();
     }
   }
 
   function escapeHtml(str) {
-    return str.replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+    return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   }
 </script>
 
