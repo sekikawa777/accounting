@@ -22,7 +22,6 @@
     h1 { font-size: 1.6rem; margin-bottom: 16px; color: var(--primary-color); }
     h2 { font-size: 1.1rem; margin-bottom: 12px; }
     
-    /* ダッシュボード */
     .dashboard { display: block; margin-bottom: 20px; }
     .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; }
     .card-title { font-size: 0.9rem; color: #64748b; margin-bottom: 6px; font-weight: bold; }
@@ -30,21 +29,25 @@
     .card-value.plus { color: var(--success-color); }
     .card-value.minus { color: var(--danger-color); }
 
-    /* セクション & フォーム */
     .section { background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; }
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; }
     input, select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; }
     .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
-    /* ボタン */
+    .currency-input-wrapper { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 6px; background: #fff; padding-left: 10px; }
+    .currency-symbol { font-weight: bold; color: #64748b; margin-right: 4px; }
+    .currency-input-wrapper input { border: none; outline: none; padding: 8px 8px 8px 0; }
+
+    .radio-group { display: flex; gap: 16px; align-items: center; margin-top: 6px; }
+    .radio-group label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; }
+
     button { padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; font-size: 0.88rem; }
     button:hover { opacity: 0.9; }
     button.outline { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
     button.danger { background: var(--danger-color); }
     button.sm { padding: 4px 8px; font-size: 0.75rem; }
 
-    /* テーブル */
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
     th, td { border-bottom: 1px solid var(--border-color); padding: 8px 10px; text-align: left; }
@@ -53,24 +56,20 @@
     .type-fee { background: #dbeafe; color: #1e40af; }
     .type-parking { background: #fef3c7; color: #92400e; }
     .type-purchase { background: #fce7f3; color: #9d174d; }
+    .type-special { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
 
-    /* ナビゲーションタブ */
     .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; overflow-x: auto; }
     .tab { padding: 10px 16px; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; font-size: 0.9rem; }
     .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
-    /* メンバーリストタグ */
-    .member-tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
-    .member-tag { background: #e2e8f0; padding: 4px 10px; border-radius: 16px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
-    .member-tag .remove-btn { cursor: pointer; color: var(--danger-color); font-weight: bold; }
+    .member-tag-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .member-item { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; padding: 8px 12px; border-radius: 6px; }
     
-    /* クラウド同期ステータス表示 */
     .sync-status { font-size: 0.75rem; color: #64748b; text-align: right; margin-bottom: 8px; }
   </style>
 
-  <!-- Firebase SDK の読み込み -->
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
@@ -80,7 +79,6 @@
   <h1>イベント会計管理</h1>
   <div class="sync-status" id="syncStatus">クラウド同期状態: 接続中...</div>
 
-  <!-- トップ表示：累計収支残高 -->
   <div class="dashboard">
     <div class="card">
       <div class="card-title">累計収支残高</div>
@@ -88,15 +86,15 @@
     </div>
   </div>
 
-  <!-- タブ切替 -->
+  <!-- タブ定義 -->
   <div class="tabs">
     <div class="tab active" onclick="switchTab('eventStatsView')">イベント</div>
-    <div class="tab" onclick="switchTab('entryView')">明細入力・詳細</div>
+    <div class="tab" onclick="switchTab('entryView')">特別費精算</div>
     <div class="tab" onclick="switchTab('summaryView')">イベント別精算</div>
     <div class="tab" onclick="switchTab('masterRegistrationView')">各種登録</div>
   </div>
 
-  <!-- タブ1: イベント (トップページ) -->
+  <!-- タブ1: イベント -->
   <div id="eventStatsView" class="tab-content active">
     <div class="section">
       <h2>イベント別 収支一覧</h2>
@@ -105,6 +103,7 @@
           <thead>
             <tr>
               <th>日付</th>
+              <th>区分</th>
               <th>イベント名</th>
               <th>収入合計</th>
               <th>支出合計</th>
@@ -118,17 +117,17 @@
     </div>
   </div>
 
-  <!-- タブ2: 明細入力・詳細情報 -->
+  <!-- タブ2: 特別費精算 -->
   <div id="entryView" class="tab-content">
     <div class="section">
       <div class="form-group" style="max-width: 350px;">
-        <label>対象イベントを選択</label>
+        <label>特別費を選択</label>
         <select id="activeEventSelect" onchange="onActiveEventChange()"></select>
       </div>
     </div>
 
     <div class="section">
-      <h2 id="entrySectionTitle">明細の追加</h2>
+      <h2 id="entrySectionTitle">特別費明細の追加</h2>
       <form id="accountingForm" onsubmit="addEntry(event)">
         <div class="form-row">
           <div class="form-group">
@@ -136,21 +135,41 @@
             <select id="entryMemberSelect" required></select>
           </div>
           <div class="form-group">
+            <label>チーム名</label>
+            <input type="text" id="entryTeamName" placeholder="チーム名を入力">
+          </div>
+          <div class="form-group">
             <label>区分</label>
-            <select id="entryType">
+            <select id="entryType" onchange="toggleAmountInputMode()">
               <option value="参加費用">参加費用 (収入)</option>
               <option value="駐車場代">駐車場代 (収入)</option>
               <option value="購入物支給">購入物・立替費 (支出)</option>
             </select>
           </div>
+          
           <div class="form-group">
-            <label>金額 (円)</label>
-            <input type="number" id="entryAmount" min="0" placeholder="0" required>
+            <label>金額</label>
+            <!-- 参加費選択肢 -->
+            <select id="entryAmountSelectFee">
+              <option value="0">0円</option>
+              <option value="500">500円</option>
+              <option value="1000">1000円</option>
+            </select>
+            <!-- 駐車場代選択肢 -->
+            <select id="entryAmountSelectParking" style="display:none;">
+              <option value="0">0円</option>
+              <option value="1000">1000円</option>
+            </select>
+            <!-- 立替費（手入力） -->
+            <div id="entryAmountCustomWrapper" class="currency-input-wrapper" style="display:none;">
+              <span class="currency-symbol">￥</span>
+              <input type="number" id="entryAmountCustom" min="0" placeholder="0">
+            </div>
           </div>
         </div>
         <div class="form-group">
           <label>メモ / 品名</label>
-          <input type="text" id="entryMemo" placeholder="例: 参加費、駐車場代、立替品など">
+          <input type="text" id="entryMemo" placeholder="例: 支出詳細、備品代など">
         </div>
         <button type="submit">追加する</button>
       </form>
@@ -166,6 +185,7 @@
           <thead>
             <tr>
               <th>メンバー</th>
+              <th>チーム名</th>
               <th>区分</th>
               <th>メモ</th>
               <th>金額</th>
@@ -190,6 +210,7 @@
           <thead>
             <tr>
               <th>メンバー名</th>
+              <th>チーム名</th>
               <th>参加費</th>
               <th>駐車場代</th>
               <th>購入物・立替</th>
@@ -210,11 +231,18 @@
         <div class="form-row">
           <div class="form-group">
             <label>イベント名</label>
-            <input type="text" id="newEventName" placeholder="例: 夏季走行会" required>
+            <input type="text" id="newEventName" placeholder="例: 特別イベント/通常走行会" required>
           </div>
           <div class="form-group">
             <label>開催日付</label>
             <input type="date" id="newEventDate" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>イベント種別（区分）</label>
+          <div class="radio-group">
+            <label><input type="radio" name="eventTypeCategory" value="normal" checked> 通常イベント（イベント別精算）</label>
+            <label><input type="radio" name="eventTypeCategory" value="special"> 特別費（特別費精算）</label>
           </div>
         </div>
         <button type="submit">イベントを追加</button>
@@ -222,9 +250,8 @@
     </div>
 
     <div class="section">
-      <h2>メンバーの登録・削除</h2>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※登録したメンバーが各イベントの明細入力で共有選択できます。</p>
-      <form onsubmit="addMasterMember(event)">
+      <h2>メンバーの登録・編集・削除</h2>
+      <form onsubmit="addMasterMember(event)" style="margin-bottom: 15px;">
         <div class="form-row">
           <div class="form-group">
             <input type="text" id="newMemberName" placeholder="例: 山田 太郎" required>
@@ -246,7 +273,6 @@
 </div>
 
 <script>
-  // クラウドDB（Firebase）設定
   const firebaseConfig = {
     databaseURL: "https://sekikawa-accounting-default-rtdb.firebaseio.com"
   };
@@ -269,7 +295,6 @@
     const formEl = document.getElementById('createEventForm');
     if (formEl) formEl.addEventListener('submit', createEvent);
 
-    // クラウドデータのリアルタイム監視
     dbRef.on('value', (snapshot) => {
       const statusEl = document.getElementById('syncStatus');
       const data = snapshot.val();
@@ -334,15 +359,18 @@
     renderEventStats();
     renderMemberMaster();
     updateCalculations();
+    toggleAmountInputMode();
   }
 
   function createEvent(e) {
     e.preventDefault();
     const nameInput = document.getElementById('newEventName');
     const dateInput = document.getElementById('newEventDate');
+    const categoryInput = document.querySelector('input[name="eventTypeCategory"]:checked');
 
     const name = nameInput.value.trim();
     const date = dateInput.value;
+    const isSpecial = categoryInput ? categoryInput.value === 'special' : false;
 
     if (!name || !date) {
       alert('イベント名と日付を入力してください');
@@ -351,13 +379,13 @@
 
     const newId = 'e_' + Date.now();
     if (!state.events) state.events = [];
-    state.events.push({ id: newId, name: name, date: date });
+    state.events.push({ id: newId, name: name, date: date, isSpecial: isSpecial });
     state.currentEventId = newId;
 
     saveData();
     nameInput.value = '';
 
-    switchTab('eventStatsView');
+    switchTab(isSpecial ? 'entryView' : 'eventStatsView');
   }
 
   function deleteEvent(id) {
@@ -375,7 +403,12 @@
   function openEventDetails(id) {
     state.currentEventId = id;
     saveData();
-    switchTab('entryView');
+    const ev = (state.events || []).find(e => e.id === id);
+    if (ev && ev.isSpecial) {
+      switchTab('entryView');
+    } else {
+      switchTab('summaryView');
+    }
   }
 
   function renderEventStats() {
@@ -384,7 +417,7 @@
     tbody.innerHTML = '';
 
     if (!state.events || state.events.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">イベントがありません</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">イベントがありません</td></tr>';
       return;
     }
 
@@ -403,6 +436,7 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${ev.date}</td>
+        <td><span class="type-badge ${ev.isSpecial ? 'type-special' : 'type-fee'}">${ev.isSpecial ? '特別費' : '通常'}</span></td>
         <td><strong>${escapeHtml(ev.name)}</strong></td>
         <td>¥${income.toLocaleString()}</td>
         <td>¥${expense.toLocaleString()}</td>
@@ -421,14 +455,23 @@
     if (!sel) return;
     sel.innerHTML = '';
 
-    const sortedEvents = [...(state.events || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
-    sortedEvents.forEach(e => {
+    // 特別費マークのついたイベントのみを抽出
+    const specialEvents = (state.events || []).filter(e => e.isSpecial).sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    if (specialEvents.length === 0) {
       const opt = document.createElement('option');
-      opt.value = e.id;
-      opt.textContent = `${e.date} : ${e.name}`;
-      if (e.id === state.currentEventId) opt.selected = true;
+      opt.value = "";
+      opt.textContent = "特別費イベントがありません";
       sel.appendChild(opt);
-    });
+    } else {
+      specialEvents.forEach(e => {
+        const opt = document.createElement('option');
+        opt.value = e.id;
+        opt.textContent = `${e.date} : ${e.name}`;
+        if (e.id === state.currentEventId) opt.selected = true;
+        sel.appendChild(opt);
+      });
+    }
 
     const memSel = document.getElementById('entryMemberSelect');
     if (memSel) {
@@ -444,38 +487,72 @@
     const curEv = (state.events || []).find(e => e.id === state.currentEventId);
     const titleEl = document.getElementById('entrySectionTitle');
     if (curEv && titleEl) {
-      titleEl.textContent = `明細の追加（${curEv.name}）`;
+      titleEl.textContent = `特別費明細の追加（${curEv.name}）`;
     }
   }
 
   function onActiveEventChange() {
     const sel = document.getElementById('activeEventSelect');
-    if (sel) {
+    if (sel && sel.value) {
       state.currentEventId = sel.value;
       saveData();
       renderAll();
     }
   }
 
+  function toggleAmountInputMode() {
+    const type = document.getElementById('entryType').value;
+    const feeSel = document.getElementById('entryAmountSelectFee');
+    const parkSel = document.getElementById('entryAmountSelectParking');
+    const customWrapper = document.getElementById('entryAmountCustomWrapper');
+
+    feeSel.style.display = 'none';
+    parkSel.style.display = 'none';
+    customWrapper.style.display = 'none';
+
+    if (type === '参加費用') {
+      feeSel.style.display = 'block';
+    } else if (type === '駐車場代') {
+      parkSel.style.display = 'block';
+    } else {
+      customWrapper.style.display = 'flex';
+    }
+  }
+
   function addEntry(e) {
     e.preventDefault();
     if (!state.currentEventId) {
-      alert('対象イベントを選択してください');
+      alert('対象の特別費イベントを選択してください');
       return;
     }
+
+    const type = document.getElementById('entryType').value;
+    let amount = 0;
+
+    if (type === '参加費用') {
+      amount = parseInt(document.getElementById('entryAmountSelectFee').value, 10);
+    } else if (type === '駐車場代') {
+      amount = parseInt(document.getElementById('entryAmountSelectParking').value, 10);
+    } else {
+      amount = parseInt(document.getElementById('entryAmountCustom').value, 10) || 0;
+    }
+
     const entry = {
       id: Date.now(),
       eventId: state.currentEventId,
       memberName: document.getElementById('entryMemberSelect').value,
-      type: document.getElementById('entryType').value,
-      amount: parseInt(document.getElementById('entryAmount').value, 10),
+      teamName: document.getElementById('entryTeamName').value.trim(),
+      type: type,
+      amount: amount,
       memo: document.getElementById('entryMemo').value.trim()
     };
+
     if (!state.entries) state.entries = [];
     state.entries.push(entry);
     saveData();
     renderAll();
-    document.getElementById('entryAmount').value = '';
+
+    document.getElementById('entryAmountCustom').value = '';
     document.getElementById('entryMemo').value = '';
   }
 
@@ -492,7 +569,7 @@
 
     const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
     if (eventEntries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">明細データがありません</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">明細データがありません</td></tr>';
       return;
     }
 
@@ -505,6 +582,7 @@
 
       tr.innerHTML = `
         <td><strong>${escapeHtml(item.memberName)}</strong></td>
+        <td>${escapeHtml(item.teamName || '-')}</td>
         <td><span class="type-badge ${badgeClass}">${item.type}</span></td>
         <td>${escapeHtml(item.memo || '-')}</td>
         <td style="font-weight:bold;">${amountSign}¥${item.amount.toLocaleString()}</td>
@@ -526,11 +604,12 @@
     tbody.innerHTML = '';
 
     const summary = {};
-    (state.members || []).forEach(m => summary[m] = { fee: 0, parking: 0, purchase: 0 });
+    (state.members || []).forEach(m => summary[m] = { teamName: '', fee: 0, parking: 0, purchase: 0 });
 
     const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
     eventEntries.forEach(item => {
-      if (!summary[item.memberName]) summary[item.memberName] = { fee: 0, parking: 0, purchase: 0 };
+      if (!summary[item.memberName]) summary[item.memberName] = { teamName: '', fee: 0, parking: 0, purchase: 0 };
+      if (item.teamName) summary[item.memberName].teamName = item.teamName;
       if (item.type === '参加費用') summary[item.memberName].fee += item.amount;
       if (item.type === '駐車場代') summary[item.memberName].parking += item.amount;
       if (item.type === '購入物支給') summary[item.memberName].purchase += item.amount;
@@ -542,6 +621,7 @@
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td><strong>${escapeHtml(name)}</strong></td>
+        <td>${escapeHtml(data.teamName || '-')}</td>
         <td>¥${data.fee.toLocaleString()}</td>
         <td>¥${data.parking.toLocaleString()}</td>
         <td>¥${data.purchase.toLocaleString()}</td>
@@ -566,6 +646,23 @@
     }
   }
 
+  function editMasterMember(oldName) {
+    const newName = prompt('メンバー名を変更してください:', oldName);
+    if (newName && newName.trim() !== '' && newName.trim() !== oldName) {
+      const trimmed = newName.trim();
+      const index = state.members.indexOf(oldName);
+      if (index !== -1) {
+        state.members[index] = trimmed;
+        // 過去の明細データ内の名前も更新
+        (state.entries || []).forEach(e => {
+          if (e.memberName === oldName) e.memberName = trimmed;
+        });
+        saveData();
+        renderAll();
+      }
+    }
+  }
+
   function removeMasterMember(name) {
     if (confirm(`${name} さんを削除しますか？`)) {
       state.members = state.members.filter(m => m !== name);
@@ -579,10 +676,16 @@
     if (!container) return;
     container.innerHTML = '';
     (state.members || []).forEach(m => {
-      const tag = document.createElement('div');
-      tag.className = 'member-tag';
-      tag.innerHTML = `<span>${escapeHtml(m)}</span><span class="remove-btn" onclick="removeMasterMember('${escapeHtml(m)}')">&times;</span>`;
-      container.appendChild(tag);
+      const item = document.createElement('div');
+      item.className = 'member-item';
+      item.innerHTML = `
+        <span><strong>${escapeHtml(m)}</strong></span>
+        <div>
+          <button class="outline sm" onclick="editMasterMember('${escapeHtml(m)}')">編集</button>
+          <button class="danger sm" onclick="removeMasterMember('${escapeHtml(m)}')">削除</button>
+        </div>
+      `;
+      container.appendChild(item);
     });
   }
 
@@ -607,9 +710,9 @@
       alert('出力するデータがありません');
       return;
     }
-    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\nメンバー名,区分,メモ,金額\n`;
+    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\nメンバー名,チーム名,区分,メモ,金額\n`;
     evEntries.forEach(e => {
-      csvStr += `"${e.memberName}","${e.type}","${e.memo || ''}",${e.amount}\n`;
+      csvStr += `"${e.memberName}","${e.teamName || ''}","${e.type}","${e.memo || ''}",${e.amount}\n`;
     });
 
     const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
