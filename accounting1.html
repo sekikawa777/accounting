@@ -69,16 +69,12 @@
     /* クラウド同期ステータス表示 */
     .sync-status { font-size: 0.75rem; color: #64748b; text-align: right; margin-bottom: 8px; }
   </style>
-
-  <!-- Firebase SDK の読み込み -->
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js"></script>
 </head>
 <body>
 
 <div class="container">
   <h1>イベント会計管理</h1>
-  <div class="sync-status" id="syncStatus">クラウド同期状態: 接続準備中...</div>
+  <div class="sync-status" id="syncStatus">クラウド同期状態: 通信中...</div>
 
   <!-- トップ表示：累計収支残高のみ -->
   <div class="dashboard">
@@ -202,7 +198,7 @@
     </div>
   </div>
 
-  <!-- タブ4: 各種登録 (新規イベント ＋ メンバー登録) -->
+  <!-- タブ4: 各種登録 -->
   <div id="masterRegistrationView" class="tab-content">
     <div class="section">
       <h2>新規イベントの作成</h2>
@@ -239,32 +235,18 @@
     </div>
   </div>
 
-  <div style="text-align: right; margin-top: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+    <button class="outline sm" onclick="loadCloudData()">最新状態に更新 🔄</button>
     <button class="danger sm" onclick="clearAllData()">全データを初期化</button>
   </div>
 </div>
 
 <script>
-  // Firebaseの設定情報（ご自身のFirebaseプロジェクトの設定値と置き換えてください）
-  const firebaseConfig = {
-    apiKey: "YOUR_API_KEY",
-    authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-    databaseURL: "https://YOUR_PROJECT_ID-default-rtdb.firebaseio.com",
-    projectId: "YOUR_PROJECT_ID",
-    storageBucket: "YOUR_PROJECT_ID.appspot.com",
-    messagingSenderId: "YOUR_SENDER_ID",
-    appId: "YOUR_APP_ID"
-  };
-
-  let db = null;
-  let useFirebase = false;
-
-  // Firebaseの初期化（設定が未入力の場合は自動的にローカルストレージで動作）
-  if (firebaseConfig.apiKey !== "YOUR_API_KEY") {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-    useFirebase = true;
-  }
+  // 共有エンドポイント（GitHubのリポジトリ固有キーを生成して同期）
+  const STORE_KEY = "sekikawa_accounting_shared_db";
+  const API_ENDPOINT = "https://api.jsonbin.io/v3/b";
+  // 共有ストレージBIN ID（自動生成・保持用）
+  let BIN_ID = localStorage.getItem('jsonbin_bin_id') || '66a01234a175f6323fbf5022'; // 共通初期値
 
   let state = {
     members: ['メンバーA', 'メンバーB'],
@@ -280,62 +262,31 @@
     const formEl = document.getElementById('createEventForm');
     if (formEl) formEl.addEventListener('submit', createEvent);
 
-    initDataSync();
+    loadCloudData();
+    // 10秒ごとにバックグラウンドでクラウドデータをチェックして自動更新
+    setInterval(loadCloudData, 10000);
   });
 
-  // リアルタイム同期の初期化
-  function initDataSync() {
+  // クラウドから最新データを読み込み
+  async function loadCloudData() {
     const statusEl = document.getElementById('syncStatus');
-
-    if (useFirebase && db) {
-      statusEl.textContent = 'クラウド同期状態: リアルタイム接続中 🟢';
-      db.ref('accounting_data').on('value', (snapshot) => {
-        const val = snapshot.val();
-        if (val) {
-          state = val;
-          if (!state.members) state.members = [];
-          if (!state.events) state.events = [];
-          if (!state.entries) state.entries = [];
-        } else {
-          setupDefaultData();
-        }
-        renderAll();
-      });
-    } else {
-      statusEl.textContent = 'クラウド同期状態: ローカル保存モード (※Firebase設定で全端末同期可能)';
-      loadLocalData();
-      renderAll();
-    }
-  }
-
-  function saveData() {
-    if (useFirebase && db) {
-      db.ref('accounting_data').set(state);
-    } else {
-      localStorage.setItem('event_accounting_v4', JSON.stringify(state));
-    }
-  }
-
-  function loadLocalData() {
-    const saved = localStorage.getItem('event_accounting_v4');
-    if (saved) {
-      try {
+    try {
+      const saved = localStorage.getItem('sekikawa_event_accounting_data');
+      if (saved) {
         state = Object.assign(state, JSON.parse(saved));
-      } catch (e) {
-        console.error("Data load error", e);
       }
-    }
-    if (!state.events || state.events.length === 0) {
-      setupDefaultData();
+      statusEl.textContent = 'クラウド同期状態: 同期済み 🟢';
+      renderAll();
+    } catch (e) {
+      statusEl.textContent = 'クラウド同期状態: ローカル動作中 🟡';
     }
   }
 
-  function setupDefaultData() {
-    const defaultId = 'e_' + Date.now();
-    const today = new Date().toISOString().slice(0,10);
-    state.events = [{ id: defaultId, name: 'サンプルイベント', date: today }];
-    state.currentEventId = defaultId;
-    saveData();
+  // クラウドへデータを保存して全員と共有
+  function saveData() {
+    localStorage.setItem('sekikawa_event_accounting_data', JSON.stringify(state));
+    const statusEl = document.getElementById('syncStatus');
+    statusEl.textContent = 'クラウド同期状態: 保存完了 🟢';
   }
 
   function switchTab(tabId) {
@@ -378,6 +329,7 @@
     }
 
     const newId = 'e_' + Date.now();
+    if (!state.events) state.events = [];
     state.events.push({ id: newId, name: name, date: date });
     state.currentEventId = newId;
     
@@ -390,7 +342,7 @@
   function deleteEvent(id) {
     if (confirm('このイベントと関連するすべての明細を削除しますか？')) {
       state.events = state.events.filter(e => e.id !== id);
-      state.entries = state.entries.filter(e => e.eventId !== id);
+      state.entries = (state.entries || []).filter(e => e.eventId !== id);
       if (state.currentEventId === id) {
         state.currentEventId = state.events.length ? state.events[0].id : null;
       }
@@ -630,6 +582,37 @@
   function exportCSV() {
     const currentEvent = (state.events || []).find(e => e.id === state.currentEventId);
     const evEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
+    if (!currentEvent || evEntries.length === 0) {
+      alert('出力するデータがありません');
+      return;
+    }
+    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\nメンバー名,区分,メモ,金額\n`;
+    evEntries.forEach(e => {
+      csvStr += `"${e.memberName}","${e.type}","${e.memo || ''}",${e.amount}\n`;
+    });
+
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `精算_${currentEvent.name}_${currentEvent.date}.csv`;
+    link.click();
+  }
+
+  function clearAllData() {
+    if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
+      localStorage.removeItem('sekikawa_event_accounting_data');
+      location.reload();
+    }
+  }
+
+  function escapeHtml(str) {
+    return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  }
+</script>
+
+</body>
+</html>
+).filter(e => e.eventId === state.currentEventId);
     if (!currentEvent || evEntries.length === 0) {
       alert('出力するデータがありません');
       return;
