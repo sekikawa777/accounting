@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>イベント会計管理アプリ</title>
+  <style>
+    :root {
+      --primary-color: #2563eb;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-color: #1e293b;
+      --border-color: #e2e8f0;
+      --danger-color: #ef4444;
+      --success-color: #10b981;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 16px; line-height: 1.5; }
+    .container { max-width: 980px; margin: 0 auto; }
+    
+    h1 { font-size: 1.6rem; margin-bottom: 16px; color: var(--primary-color); }
+    h2 { font-size: 1.1rem; margin-bottom: 12px; }
+    
+    .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
+    .card-title { font-size: 0.9rem; color: #64748b; margin-bottom: 6px; font-weight: bold; }
+    .card-value { font-size: 2rem; font-weight: bold; }
+    .card-value.plus { color: var(--success-color); }
+    .card-value.minus { color: var(--danger-color); }
+
+    .section { background: var(--card-bg); padding: 18px; border-radius: 8px; border: 1px solid var(--border-color); margin-bottom: 20px; }
+    .form-group { margin-bottom: 12px; }
+    label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; }
+    input, select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; color: var(--text-color); }
+    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+
+    /* イベント種別（ラジオボタン）を必ず1行に収めるスタイル修正 */
+    .radio-group { 
+      display: flex; 
+      gap: 16px; 
+      align-items: center; 
+      margin-top: 6px; 
+      white-space: nowrap; 
+      flex-wrap: nowrap;
+    }
+    .radio-group label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; white-space: nowrap; }
+
+    button { padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; font-size: 0.88rem; }
+    button:hover { opacity: 0.9; }
+    button.outline { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
+    button.danger { background: var(--danger-color); }
+    button.sm { padding: 4px 8px; font-size: 0.75rem; }
+    
+    /* リードオンリー時のスタイル指定 */
+    input:disabled, select:disabled {
+      opacity: 1 !important;
+      -webkit-text-fill-color: var(--text-color) !important;
+      color: var(--text-color) !important;
+      background-color: #ffffff !important;
+      cursor: not-allowed;
+    }
+
+    button:disabled {
+      opacity: 0.5 !important;
+      cursor: not-allowed !important;
+    }
+
+    /* イベント選択エリアと横並び収支表示 */
+    .event-selector-header {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .event-balance-badge {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1.05rem;
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      margin-bottom: 12px;
+    }
+
+    /* イベント種別バッジ */
+    .type-badge {
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: bold;
+    }
+    .type-badge.type-fee { background: #dbeafe; color: #1e40af; }
+    .type-badge.type-special { background: #fce7f3; color: #9d174d; }
+
+    /* チーム名カラー */
+    .team-select {
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+    .team-Aチーム { background-color: #ecfdf5 !important; color: #047857 !important; border-color: #a7f3d0; }
+    .team-Bチーム { background-color: #f5f3ff !important; color: #6d28d9 !important; border-color: #ddd6fe; }
+    .team-エンジョイ { background-color: #fff7ed !important; color: #c2410c !important; border-color: #ffedd5; }
+    .team-エンジョイ2 { background-color: #f0fdf4 !important; color: #15803d !important; border-color: #bbf7d0; }
+    .team-オッサンズ { background-color: #fefce8 !important; color: #a16207 !important; border-color: #fef08a; }
+    .team-ピットサポート { background-color: #f1f5f9 !important; color: #475569 !important; border-color: #cbd5e1; }
+
+    /* 丸型チェックボタン */
+    .round-check-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+    .round-check-btn.checked {
+      background: var(--primary-color) !important;
+      border-color: var(--primary-color) !important;
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+    }
+
+    /* チェック時の名前青色変化 */
+    .member-name-text.paid {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
+    .table-container { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
+    th, td { border-bottom: 1px solid var(--border-color); padding: 8px 10px; text-align: left; vertical-align: middle; }
+    th { background: #f1f5f9; font-weight: 600; }
+
+    /* テーブル内入力スタイル */
+    .table-input {
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.88rem;
+      width: 100%;
+    }
+    .table-input.amount-expense {
+      color: var(--danger-color) !important;
+      -webkit-text-fill-color: var(--danger-color) !important;
+      font-weight: bold;
+    }
+    .table-input.amount-income {
+      color: var(--text-color) !important;
+      -webkit-text-fill-color: var(--text-color) !important;
+      font-weight: bold;
+    }
+
+    .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; overflow-x: auto; }
+    .tab { padding: 10px 16px; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; font-size: 0.9rem; }
+    .tab.active { color: var(--primary-color); border-bottom-color: var(--primary-color); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .member-tag-list { display: flex; flex-direction: column; gap: 8px; margin-top: 10px; }
+    .member-item { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; padding: 8px 12px; border-radius: 6px; }
+    
+    .sync-status { font-size: 0.75rem; color: #64748b; text-align: right; margin-bottom: 8px; }
+    .table-select { padding: 4px 8px; font-size: 0.85rem; }
+
+    /* 管理者認証バー */
+    .admin-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #e0f2fe;
+      border: 1px solid #bae6fd;
+      padding: 12px 16px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .admin-badge {
+      font-weight: bold;
+      font-size: 0.88rem;
+      color: #0369a1;
+    }
+    .admin-badge.active {
+      color: var(--success-color);
+    }
+
+    .add-member-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      margin-top: 12px;
+      max-width: 400px;
+    }
+  </style>
+
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div class="container">
+  <h1>イベント会計管理</h1>
+  <div class="sync-status" id="syncStatus">クラウド同期状態: 接続中...</div>
+
+  <!-- タブ定義 -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('eventStatsView')">イベント</div>
+    <div class="tab" onclick="switchTab('summaryView')">イベント別精算</div>
+    <div class="tab" onclick="switchTab('entryView')">特別費精算</div>
+    <div class="tab" onclick="switchTab('masterRegistrationView')">各種登録</div>
+  </div>
+
+  <!-- タブ1: イベント -->
+  <div id="eventStatsView" class="tab-content active">
+    <div class="card">
+      <div class="card-title">累計総合収支</div>
+      <div id="totalBalance" class="card-value">¥0</div>
+    </div>
+
+    <div class="section">
+      <h2>イベント別 収支一覧</h2>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>日付</th>
+              <th>区分</th>
+              <th>イベント名</th>
+              <th>収入合計</th>
+              <th>支出合計</th>
+              <th>イベント収支</th>
+              <th>詳細 / 操作</th>
+            </tr>
+          </thead>
+          <tbody id="eventStatsBody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブ2: イベント別精算 -->
+  <div id="summaryView" class="tab-content">
+    <div class="section">
+      <div class="event-selector-header">
+        <div class="form-group" style="max-width: 350px; margin-bottom:0; flex-grow: 1;">
+          <label>通常イベントを選択</label>
+          <select id="normalEventSelect" onchange="onNormalEventChange()"></select>
+        </div>
+        <div id="normalEventBalance" class="event-balance-badge">イベント収支: ¥0</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 id="summaryTitle">メンバー別 精算状況</h2>
+        <button class="outline sm" onclick="exportCSV('normal')">CSV出力</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 40px; text-align: center;">#</th>
+              <th>メンバー名</th>
+              <th>チーム名</th>
+              <th>参加費</th>
+              <th>駐車場代</th>
+              <th>購入物立替</th>
+              <th>差引 精算額</th>
+              <th style="text-align:center;">受領</th>
+              <th style="text-align:center;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="memberSummaryBody"></tbody>
+        </table>
+      </div>
+
+      <div class="add-member-bar">
+        <select id="masterMemberAddSelect" class="table-select admin-only-input" style="flex-grow: 1; padding: 6px 10px;"></select>
+        <button id="addMemberToEventBtn" class="admin-only sm" onclick="addMemberToCurrentEvent()">＋ メンバーを追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブ3: 特別費精算 -->
+  <div id="entryView" class="tab-content">
+    <div class="section">
+      <div class="event-selector-header">
+        <div class="form-group" style="max-width: 350px; margin-bottom:0; flex-grow: 1;">
+          <label>特別費を選択</label>
+          <select id="activeEventSelect" onchange="onActiveEventChange()"></select>
+        </div>
+        <div id="specialEventBalance" class="event-balance-badge">イベント収支: ¥0</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2 id="entrySectionTitle">特別費 明細一覧</h2>
+        <button class="outline sm" onclick="exportCSV('special')">CSV出力</button>
+      </div>
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th style="width: 25%;">品名</th>
+              <th style="width: 20%;">区分</th>
+              <th style="width: 25%;">メモ</th>
+              <th style="width: 15%;">金額</th>
+              <th style="width: 15%;">操作</th>
+            </tr>
+          </thead>
+          <tbody id="entriesTableBody"></tbody>
+        </table>
+      </div>
+      <div style="margin-top: 12px;">
+        <button id="addSpecialBtn" class="outline admin-only" onclick="addEmptySpecialEntry()">＋ 項目を追加</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- タブ4: 各種登録 -->
+  <div id="masterRegistrationView" class="tab-content">
+    <div class="admin-bar">
+      <div>
+        <span class="admin-badge" id="adminStatusText">モード: 👁️ 閲覧専用（リードオンリー）</span>
+      </div>
+      <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+        <input type="password" id="adminPasswordInput" placeholder="管理者パスワード" style="width: 160px; padding: 6px 10px; font-size: 0.85rem;">
+        <button id="adminLoginBtn" onclick="toggleAdminMode()" class="sm">ログイン</button>
+        <button id="changePwdBtn" onclick="changeAdminPassword()" class="outline sm admin-only" style="display:none;">パスワード変更</button>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>新規イベントの作成</h2>
+      <form id="createEventForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>イベント名</label>
+            <input type="text" id="newEventName" class="admin-only-input" placeholder="例: 通常走行会 / 特別精算" required>
+          </div>
+          <div class="form-group">
+            <label>開催日付</label>
+            <input type="date" id="newEventDate" class="admin-only-input" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>イベント種別（区分）</label>
+          <div class="radio-group">
+            <label><input type="radio" name="eventTypeCategory" class="admin-only-input" value="normal" checked> 通常イベント</label>
+            <label><input type="radio" name="eventTypeCategory" class="admin-only-input" value="special"> 特別費用</label>
+          </div>
+        </div>
+        <button type="submit" id="createEventBtn" class="admin-only">イベントを追加</button>
+      </form>
+    </div>
+
+    <div class="section">
+      <h2>メンバーの登録・編集・削除（共通マスター）</h2>
+      <form onsubmit="addMasterMember(event)" style="margin-bottom: 15px;">
+        <div class="form-row">
+          <div class="form-group">
+            <input type="text" id="newMemberName" class="admin-only-input" placeholder="例: 山田 太郎" required>
+          </div>
+          <div class="form-group">
+            <button type="submit" id="addMemberBtn" class="admin-only">メンバーを追加</button>
+          </div>
+        </div>
+      </form>
+
+      <div class="member-tag-list" id="memberTagList"></div>
+    </div>
+  </div>
+
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+    <button class="outline sm" onclick="manualSync()">最新状態に更新 🔄</button>
+    <button class="danger sm admin-only" id="clearAllBtn" onclick="clearAllData()">全データを初期化</button>
+  </div>
+</div>
+
+<script>
+  const INITIAL_BALANCE = 60000; // 初期資金 6万円
+  const DEFAULT_ADMIN_PASSWORD = "admin123"; // デフォルトパスワード
+
+  let isAdmin = false; // 管理者権限フラグ
+
+  const firebaseConfig = {
+    databaseURL: "https://sekikawa-accounting-default-rtdb.firebaseio.com"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const dbRef = db.ref("shared_accounting_data");
+
+  let state = {
+    adminPassword: DEFAULT_ADMIN_PASSWORD,
+    members: ['メンバーA', 'メンバーB'],
+    memberTeams: {}, 
+    eventSettlements: {}, 
+    events: [],
+    entries: [],
+    currentNormalEventId: null,
+    currentSpecialEventId: null
+  };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const dateEl = document.getElementById('newEventDate');
+    if (dateEl) dateEl.valueAsDate = new Date();
+
+    const formEl = document.getElementById('createEventForm');
+    if (formEl) formEl.addEventListener('submit', createEvent);
+
+    dbRef.on('value', (snapshot) => {
+      const statusEl = document.getElementById('syncStatus');
+      const data = snapshot.val();
+      if (data) {
+        state = data;
+        if (!state.adminPassword) state.adminPassword = DEFAULT_ADMIN_PASSWORD;
+        if (!state.members) state.members = [];
+        if (!state.memberTeams) state.memberTeams = {};
+        if (!state.eventSettlements) state.eventSettlements = {};
+        if (!state.events) state.events = [];
+        if (!state.entries) state.entries = [];
+      }
+      if (statusEl) statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+      renderAll();
+    }, (error) => {
+      const statusEl = document.getElementById('syncStatus');
+      if (statusEl) statusEl.textContent = 'クラウド同期状態: 接続エラー 🔴';
+    });
+  });
+
+  /* 管理者権限切り替え */
+  function toggleAdminMode() {
+    const pwdInput = document.getElementById('adminPasswordInput');
+    const statusText = document.getElementById('adminStatusText');
+    const loginBtn = document.getElementById('adminLoginBtn');
+    const changePwdBtn = document.getElementById('changePwdBtn');
+
+    const currentPassword = state.adminPassword || DEFAULT_ADMIN_PASSWORD;
+
+    if (isAdmin) {
+      isAdmin = false;
+      pwdInput.value = '';
+      pwdInput.style.display = 'inline-block';
+      statusText.textContent = 'モード: 👁️ 閲覧専用（リードオンリー）';
+      statusText.className = 'admin-badge';
+      loginBtn.textContent = 'ログイン';
+      if (changePwdBtn) changePwdBtn.style.display = 'none';
+      alert('ログアウトしました。閲覧専用モードに変更します。');
+    } else {
+      if (pwdInput.value === currentPassword) {
+        isAdmin = true;
+        pwdInput.style.display = 'none';
+        statusText.textContent = 'モード: 🔓 管理者モード（全編集可能）';
+        statusText.className = 'admin-badge active';
+        loginBtn.textContent = 'ログアウト';
+        if (changePwdBtn) changePwdBtn.style.display = 'inline-block';
+        alert('管理者権限でログインしました。編集が可能です。');
+      } else {
+        alert('パスワードが正しくありません。');
+      }
+    }
+    renderAll();
+  }
+
+  /* パスワード変更処理 */
+  function changeAdminPassword() {
+    if (!isAdmin) return;
+    const newPwd = prompt('新しい管理者パスワードを入力してください:');
+    if (newPwd !== null) {
+      const trimmed = newPwd.trim();
+      if (trimmed.length < 4) {
+        alert('パスワードは4文字以上で設定してください。');
+        return;
+      }
+      const confirmPwd = prompt('確認のため、もう一度新しいパスワードを入力してください:');
+      if (trimmed === confirmPwd) {
+        state.adminPassword = trimmed;
+        saveData();
+        alert('管理者パスワードを変更・保存いたしました。');
+      } else {
+        alert('確認用パスワードが一致しませんでした。変更をキャンセルします。');
+      }
+    }
+  }
+
+  function saveData() {
+    if (!isAdmin) return;
+    const statusEl = document.getElementById('syncStatus');
+    if (statusEl) statusEl.textContent = 'クラウド同期状態: 同期中... ⏳';
+
+    dbRef.set(state, (error) => {
+      if (error) {
+        if (statusEl) statusEl.textContent = 'クラウド同期状態: 保存エラー 🔴';
+      } else {
+        if (statusEl) statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+      }
+    });
+  }
+
+  function manualSync() {
+    dbRef.once('value').then((snapshot) => {
+      const data = snapshot.val();
+      if (data) state = data;
+      renderAll();
+      const statusEl = document.getElementById('syncStatus');
+      if (statusEl) statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+    });
+  }
+
+  function switchTab(tabId) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+    const tabs = Array.from(document.querySelectorAll('.tab'));
+    const activeTab = tabs.find(t => {
+      const attr = t.getAttribute('onclick');
+      return attr && attr.includes(tabId);
+    });
+
+    if (activeTab) activeTab.classList.add('active');
+    const targetContent = document.getElementById(tabId);
+    if (targetContent) targetContent.classList.add('active');
+
+    renderAll();
+  }
+
+  function renderAll() {
+    renderEventSelects();
+    renderEntries();
+    renderMemberSummary();
+    renderEventStats();
+    renderMemberMaster();
+    updateCalculations();
+    applyAdminPermissions();
+  }
+
+  function applyAdminPermissions() {
+    document.querySelectorAll('.admin-only').forEach(btn => {
+      btn.disabled = !isAdmin;
+    });
+
+    document.querySelectorAll('.admin-only-input').forEach(input => {
+      input.disabled = !isAdmin;
+    });
+
+    const changePwdBtn = document.getElementById('changePwdBtn');
+    if (changePwdBtn) {
+      changePwdBtn.style.display = isAdmin ? 'inline-block' : 'none';
+    }
+  }
+
+  function createEvent(e) {
+    e.preventDefault();
+    if (!isAdmin) return;
+    const nameInput = document.getElementById('newEventName');
+    const dateInput = document.getElementById('newEventDate');
+    const categoryInput = document.querySelector('input[name="eventTypeCategory"]:checked');
+
+    const name = nameInput.value.trim();
+    const date = dateInput.value;
+    const isSpecial = categoryInput ? categoryInput.value === 'special' : false;
+
+    if (!name || !date) {
+      alert('イベント名と日付を入力してください');
+      return;
+    }
+
+    const newId = 'e_' + Date.now();
+    if (!state.events) state.events = [];
+    state.events.push({ id: newId, name: name, date: date, isSpecial: isSpecial });
+    
+    if (isSpecial) {
+      state.currentSpecialEventId = newId;
+    } else {
+      state.currentNormalEventId = newId;
+    }
+
+    saveData();
+    nameInput.value = '';
+
+    switchTab(isSpecial ? 'entryView' : 'summaryView');
+  }
+
+  function deleteEvent(id) {
+    if (!isAdmin) return;
+    if (confirm('このイベントと関連するすべての明細を削除しますか？')) {
+      state.events = (state.events || []).filter(e => e.id !== id);
+      state.entries = (state.entries || []).filter(e => e.eventId !== id);
+      if (state.eventSettlements && state.eventSettlements[id]) {
+        delete state.eventSettlements[id];
+      }
+      saveData();
+      renderAll();
+    }
+  }
+
+  function openEventDetails(id) {
+    const ev = (state.events || []).find(e => e.id === id);
+    if (ev && ev.isSpecial) {
+      state.currentSpecialEventId = id;
+      switchTab('entryView');
+    } else {
+      state.currentNormalEventId = id;
+      switchTab('summaryView');
+    }
+  }
+
+  function getEventNet(ev) {
+    let income = 0;
+    let expense = 0;
+    if (ev.isSpecial) {
+      const evEntries = (state.entries || []).filter(e => e.eventId === ev.id);
+      evEntries.forEach(e => {
+        if (e.type === '特別費支出') expense += (e.amount || 0);
+        else income += (e.amount || 0);
+      });
+    } else {
+      const stData = (state.eventSettlements && state.eventSettlements[ev.id]) ? state.eventSettlements[ev.id] : {};
+      Object.keys(stData).forEach(mName => {
+        const m = stData[mName];
+        if (m.excluded) return;
+        
+        if (m.paid) {
+          income += (m.fee || 0) + (m.parking || 0);
+          expense += (m.purchase || 0);
+        }
+      });
+    }
+    return { income, expense, net: income - expense };
+  }
+
+  function renderEventStats() {
+    const tbody = document.getElementById('eventStatsBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!state.events || state.events.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">イベントがありません</td></tr>';
+      return;
+    }
+
+    const sortedEvents = [...state.events].sort((a,b) => new Date(b.date) - new Date(a.date));
+
+    sortedEvents.forEach(ev => {
+      const calc = getEventNet(ev);
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td>${ev.date}</td>
+        <td><span class="type-badge ${ev.isSpecial ? 'type-special' : 'type-fee'}">${ev.isSpecial ? '特別費' : '通常'}</span></td>
+        <td><strong>${escapeHtml(ev.name)}</strong></td>
+        <td>¥${calc.income.toLocaleString()}</td>
+        <td>¥${calc.expense.toLocaleString()}</td>
+        <td style="font-weight:bold; color:${calc.net >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">¥${calc.net.toLocaleString()}</td>
+        <td>
+          <button class="outline sm" onclick="openEventDetails('${ev.id}')">開く</button>
+          <button class="danger sm admin-only" ${!isAdmin ? 'disabled' : ''} onclick="deleteEvent('${ev.id}')">削除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function renderEventSelects() {
+    const normalSel = document.getElementById('normalEventSelect');
+    const normalEvents = (state.events || []).filter(e => !e.isSpecial).sort((a,b) => new Date(b.date) - new Date(a.date));
+    if (normalSel) {
+      normalSel.innerHTML = '';
+      if (normalEvents.length === 0) {
+        normalSel.innerHTML = '<option value="">通常イベントがありません</option>';
+      } else {
+        normalEvents.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.id;
+          opt.textContent = `${e.date} : ${e.name}`;
+          if (e.id === state.currentNormalEventId) opt.selected = true;
+          normalSel.appendChild(opt);
+        });
+        if (!state.currentNormalEventId && normalEvents.length > 0) {
+          state.currentNormalEventId = normalEvents[0].id;
+        }
+      }
+    }
+
+    const specialSel = document.getElementById('activeEventSelect');
+    const specialEvents = (state.events || []).filter(e => e.isSpecial).sort((a,b) => new Date(b.date) - new Date(a.date));
+    if (specialSel) {
+      specialSel.innerHTML = '';
+      if (specialEvents.length === 0) {
+        specialSel.innerHTML = '<option value="">特別費イベントがありません</option>';
+      } else {
+        specialEvents.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.id;
+          opt.textContent = `${e.date} : ${e.name}`;
+          if (e.id === state.currentSpecialEventId) opt.selected = true;
+          specialSel.appendChild(opt);
+        });
+        if (!state.currentSpecialEventId && specialEvents.length > 0) {
+          state.currentSpecialEventId = specialEvents[0].id;
+        }
+      }
+    }
+
+    const curSpec = (state.events || []).find(e => e.id === state.currentSpecialEventId);
+    const specTitle = document.getElementById('entrySectionTitle');
+    if (curSpec && specTitle) specTitle.textContent = `特別費 明細一覧（${curSpec.name}）`;
+  }
+
+  function onNormalEventChange() {
+    const sel = document.getElementById('normalEventSelect');
+    if (sel && sel.value) {
+      state.currentNormalEventId = sel.value;
+      renderAll();
+    }
+  }
+
+  function onActiveEventChange() {
+    const sel = document.getElementById('activeEventSelect');
+    if (sel && sel.value) {
+      state.currentSpecialEventId = sel.value;
+      renderAll();
+    }
+  }
+
+  function updateMemberTeam(memberName, teamName) {
+    if (!isAdmin) return;
+    if (!state.memberTeams) state.memberTeams = {};
+    state.memberTeams[memberName] = teamName;
+    saveData();
+    renderAll();
+  }
+
+  function renderMemberSummary() {
+    const currentEvent = (state.events || []).find(e => e.id === state.currentNormalEventId);
+    const title = document.getElementById('summaryTitle');
+    if (title) {
+      title.textContent = currentEvent ? `メンバー別 精算状況（${currentEvent.name}）` : 'メンバー別 精算状況';
+    }
+
+    const tbody = document.getElementById('memberSummaryBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!state.currentNormalEventId) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">通常イベントを選択してください</td></tr>';
+      renderMasterMemberAddSelect([]);
+      return;
+    }
+
+    const teams = ['Aチーム', 'Bチーム', 'エンジョイ', 'エンジョイ2', 'オッサンズ', 'ピットサポート'];
+
+    if (!state.eventSettlements) state.eventSettlements = {};
+    if (!state.eventSettlements[state.currentNormalEventId]) {
+      state.eventSettlements[state.currentNormalEventId] = {};
+    }
+    const currentSettlement = state.eventSettlements[state.currentNormalEventId];
+
+    let numberIndex = 1;
+
+    (state.members || []).forEach(name => {
+      if (!currentSettlement[name]) {
+        currentSettlement[name] = { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+      }
+      const mData = currentSettlement[name];
+
+      if (mData.excluded) return;
+
+      const currentTeam = (state.memberTeams && state.memberTeams[name]) ? state.memberTeams[name] : 'Aチーム';
+      
+      let teamOptionsHtml = '';
+      teams.forEach(t => {
+        teamOptionsHtml += `<option value="${t}" ${t === currentTeam ? 'selected' : ''}>${t}</option>`;
+      });
+
+      const net = (mData.fee || 0) + (mData.parking || 0) - (mData.purchase || 0);
+      const dis = !isAdmin ? 'disabled' : '';
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="text-align:center; font-weight:bold; color:#64748b;">${numberIndex++}</td>
+        <td><strong class="member-name-text ${mData.paid ? 'paid' : ''}">${escapeHtml(name)}</strong></td>
+        <td>
+          <select class="table-select team-select team-${escapeHtml(currentTeam)}" ${dis} onchange="updateMemberTeam('${escapeHtml(name)}', this.value)">
+            ${teamOptionsHtml}
+          </select>
+        </td>
+        <td>
+          <select class="table-select" ${dis} onchange="updateMemberValue('${escapeHtml(name)}', 'fee', this.value)">
+            <option value="0" ${mData.fee == 0 ? 'selected' : ''}>0円</option>
+            <option value="500" ${mData.fee == 500 ? 'selected' : ''}>500円</option>
+            <option value="1000" ${mData.fee == 1000 ? 'selected' : ''}>1000円</option>
+          </select>
+        </td>
+        <td>
+          <select class="table-select" ${dis} onchange="updateMemberValue('${escapeHtml(name)}', 'parking', this.value)">
+            <option value="0" ${mData.parking == 0 ? 'selected' : ''}>0円</option>
+            <option value="1000" ${mData.parking == 1000 ? 'selected' : ''}>1000円</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" class="table-select" ${dis} style="width: 90px; color: var(--danger-color); font-weight: bold;" placeholder="0" value="${mData.purchase || ''}" onchange="updateMemberValue('${escapeHtml(name)}', 'purchase', this.value)">
+        </td>
+        <td style="font-weight:bold; color:${net < 0 ? 'var(--danger-color)' : 'var(--text-color)'}">
+          ${net >= 0 ? `徴収: ¥${net.toLocaleString()}` : `支払: -¥${Math.abs(net).toLocaleString()}`}
+        </td>
+        <td style="text-align:center;">
+          <button class="round-check-btn ${mData.paid ? 'checked' : ''}" ${dis} onclick="toggleMemberPaid('${escapeHtml(name)}')">
+            ${mData.paid ? '✓' : '〇'}
+          </button>
+        </td>
+        <td style="text-align:center;">
+          <button class="danger sm admin-only" ${dis} onclick="excludeEventMember('${escapeHtml(name)}')">削除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    if (numberIndex === 1) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">参加メンバーがいません</td></tr>';
+    }
+
+    const availableMembers = (state.members || []).filter(name => {
+      return !currentSettlement[name] || currentSettlement[name].excluded;
+    });
+    renderMasterMemberAddSelect(availableMembers);
+  }
+
+  function renderMasterMemberAddSelect(availableMembers) {
+    const sel = document.getElementById('masterMemberAddSelect');
+    if (!sel) return;
+    sel.innerHTML = '';
+
+    if (!state.currentNormalEventId) {
+      sel.innerHTML = '<option value="">イベントを選択してください</option>';
+      return;
+    }
+
+    if (availableMembers.length === 0) {
+      sel.innerHTML = '<option value="">追加できるマスターメンバーはいません</option>';
+    } else {
+      availableMembers.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        sel.appendChild(opt);
+      });
+    }
+  }
+
+  function addMemberToCurrentEvent() {
+    if (!isAdmin) return;
+    if (!state.currentNormalEventId) {
+      alert('イベントを選択してください');
+      return;
+    }
+
+    const sel = document.getElementById('masterMemberAddSelect');
+    const memberName = sel ? sel.value : '';
+
+    if (!memberName) {
+      alert('追加するメンバーを選択してください');
+      return;
+    }
+
+    if (!state.eventSettlements[state.currentNormalEventId]) {
+      state.eventSettlements[state.currentNormalEventId] = {};
+    }
+
+    state.eventSettlements[state.currentNormalEventId][memberName] = {
+      fee: 0,
+      parking: 0,
+      purchase: 0,
+      paid: false,
+      excluded: false
+    };
+
+    saveData();
+    renderAll();
+  }
+
+  function excludeEventMember(memberName) {
+    if (!isAdmin) return;
+    if (!state.currentNormalEventId) return;
+    if (confirm(`${memberName} さんをこのイベントの精算リストから外しますか？`)) {
+      if (!state.eventSettlements[state.currentNormalEventId]) {
+        state.eventSettlements[state.currentNormalEventId] = {};
+      }
+      if (!state.eventSettlements[state.currentNormalEventId][memberName]) {
+        state.eventSettlements[state.currentNormalEventId][memberName] = { fee: 0, parking: 0, purchase: 0, paid: false };
+      }
+      state.eventSettlements[state.currentNormalEventId][memberName].excluded = true;
+      saveData();
+      renderAll();
+    }
+  }
+
+  function updateMemberValue(memberName, field, value) {
+    if (!isAdmin) return;
+    if (!state.currentNormalEventId) return;
+    if (!state.eventSettlements[state.currentNormalEventId]) state.eventSettlements[state.currentNormalEventId] = {};
+    if (!state.eventSettlements[state.currentNormalEventId][memberName]) {
+      state.eventSettlements[state.currentNormalEventId][memberName] = { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+    }
+
+    state.eventSettlements[state.currentNormalEventId][memberName][field] = parseInt(value, 10) || 0;
+    saveData();
+    renderAll();
+  }
+
+  function toggleMemberPaid(memberName) {
+    if (!isAdmin) return;
+    if (!state.currentNormalEventId) return;
+    if (!state.eventSettlements[state.currentNormalEventId]) state.eventSettlements[state.currentNormalEventId] = {};
+    if (!state.eventSettlements[state.currentNormalEventId][memberName]) {
+      state.eventSettlements[state.currentNormalEventId][memberName] = { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+    }
+
+    const currentPaid = state.eventSettlements[state.currentNormalEventId][memberName].paid;
+    state.eventSettlements[state.currentNormalEventId][memberName].paid = !currentPaid;
+    saveData();
+    renderAll();
+  }
+
+  function addEmptySpecialEntry() {
+    if (!isAdmin) return;
+    if (!state.currentSpecialEventId) {
+      alert('特別費イベントを選択してください');
+      return;
+    }
+
+    const newEntry = {
+      id: Date.now(),
+      eventId: state.currentSpecialEventId,
+      itemName: '',
+      type: '特別費支出',
+      memo: '',
+      amount: 0
+    };
+
+    if (!state.entries) state.entries = [];
+    state.entries.push(newEntry);
+    saveData();
+    renderAll();
+  }
+
+  function saveSpecialEntry(id) {
+    if (!isAdmin) return;
+    const itemEl = document.getElementById(`sp_item_${id}`);
+    const typeEl = document.getElementById(`sp_type_${id}`);
+    const memoEl = document.getElementById(`sp_memo_${id}`);
+    const amountEl = document.getElementById(`sp_amount_${id}`);
+
+    const entry = (state.entries || []).find(e => e.id === id);
+    if (entry) {
+      entry.itemName = itemEl ? itemEl.value.trim() : '';
+      entry.type = typeEl ? typeEl.value : '特別費支出';
+      entry.memo = memoEl ? memoEl.value.trim() : '';
+      entry.amount = amountEl ? (parseInt(amountEl.value, 10) || 0) : 0;
+
+      saveData();
+      renderAll();
+    }
+  }
+
+  function deleteEntry(id) {
+    if (!isAdmin) return;
+    if (confirm('この明細を削除しますか？')) {
+      state.entries = (state.entries || []).filter(e => e.id !== id);
+      saveData();
+      renderAll();
+    }
+  }
+
+  function renderEntries() {
+    const tbody = document.getElementById('entriesTableBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!state.currentSpecialEventId) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">特別費イベントを選択してください</td></tr>';
+      return;
+    }
+
+    const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentSpecialEventId);
+    if (eventEntries.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">明細データがありません。「＋ 項目を追加」から追加してください</td></tr>';
+      return;
+    }
+
+    const dis = !isAdmin ? 'disabled' : '';
+
+    eventEntries.forEach(item => {
+      const tr = document.createElement('tr');
+      const isExpense = item.type === '特別費支出';
+      
+      tr.innerHTML = `
+        <td>
+          <input type="text" id="sp_item_${item.id}" ${dis} class="table-input" placeholder="例: 備品代" value="${escapeHtml(item.itemName || '')}">
+        </td>
+        <td>
+          <select id="sp_type_${item.id}" ${dis} class="table-input" onchange="saveSpecialEntry(${item.id})">
+            <option value="特別費支出" ${isExpense ? 'selected' : ''}>特別費支出 (支出)</option>
+            <option value="特別費収入" ${!isExpense ? 'selected' : ''}>特別費収入 (収入)</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" id="sp_memo_${item.id}" ${dis} class="table-input" placeholder="メモ" value="${escapeHtml(item.memo || '')}">
+        </td>
+        <td>
+          <input type="number" id="sp_amount_${item.id}" ${dis} class="table-input ${isExpense ? 'amount-expense' : 'amount-income'}" placeholder="0" min="0" value="${item.amount || ''}" onchange="saveSpecialEntry(${item.id})">
+        </td>
+        <td>
+          <button class="outline sm admin-only" ${dis} onclick="saveSpecialEntry(${item.id})">変更</button>
+          <button class="danger sm admin-only" ${dis} onclick="deleteEntry(${item.id})">削除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+  }
+
+  function addMasterMember(e) {
+    e.preventDefault();
+    if (!isAdmin) return;
+    const input = document.getElementById('newMemberName');
+    const name = input.value.trim();
+    if (name && !(state.members || []).includes(name)) {
+      if (!state.members) state.members = [];
+      state.members.push(name);
+      if (!state.memberTeams) state.memberTeams = {};
+      state.memberTeams[name] = 'Aチーム';
+      input.value = '';
+      saveData();
+      renderAll();
+    }
+  }
+
+  function editMasterMember(oldName) {
+    if (!isAdmin) return;
+    const newName = prompt('メンバー名を変更してください:', oldName);
+    if (newName && newName.trim() !== '' && newName.trim() !== oldName) {
+      const trimmed = newName.trim();
+      const index = state.members.indexOf(oldName);
+      if (index !== -1) {
+        state.members[index] = trimmed;
+        if (state.memberTeams && state.memberTeams[oldName]) {
+          state.memberTeams[trimmed] = state.memberTeams[oldName];
+          delete state.memberTeams[oldName];
+        }
+        saveData();
+        renderAll();
+      }
+    }
+  }
+
+  function removeMasterMember(name) {
+    if (!isAdmin) return;
+    if (confirm(`${name} さんをマスターデータから削除しますか？`)) {
+      state.members = (state.members || []).filter(m => m !== name);
+      if (state.memberTeams) delete state.memberTeams[name];
+      saveData();
+      renderAll();
+    }
+  }
+
+  function renderMemberMaster() {
+    const container = document.getElementById('memberTagList');
+    if (!container) return;
+    container.innerHTML = '';
+    const dis = !isAdmin ? 'disabled' : '';
+
+    (state.members || []).forEach(m => {
+      const item = document.createElement('div');
+      item.className = 'member-item';
+      item.innerHTML = `
+        <span><strong>${escapeHtml(m)}</strong></span>
+        <div>
+          <button class="outline sm admin-only" ${dis} onclick="editMasterMember('${escapeHtml(m)}')">編集</button>
+          <button class="danger sm admin-only" ${dis} onclick="removeMasterMember('${escapeHtml(m)}')">削除</button>
+        </div>
+      `;
+      container.appendChild(item);
+    });
+  }
+
+  function updateCalculations() {
+    let totalEventNet = 0;
+
+    (state.events || []).forEach(ev => {
+      const calc = getEventNet(ev);
+      totalEventNet += calc.net;
+
+      if (ev.id === state.currentNormalEventId) {
+        const el = document.getElementById('normalEventBalance');
+        if (el) el.textContent = `イベント収支: ¥${calc.net.toLocaleString()}`;
+      }
+      if (ev.id === state.currentSpecialEventId) {
+        const el = document.getElementById('specialEventBalance');
+        if (el) el.textContent = `イベント収支: ¥${calc.net.toLocaleString()}`;
+      }
+    });
+
+    const finalBalance = INITIAL_BALANCE + totalEventNet;
+
+    const totalEl = document.getElementById('totalBalance');
+    if (totalEl) {
+      totalEl.textContent = `¥${finalBalance.toLocaleString()}`;
+      totalEl.className = `card-value ${finalBalance >= 0 ? 'plus' : 'minus'}`;
+    }
+  }
+
+  function exportCSV(mode) {
+    const targetEventId = mode === 'special' ? state.currentSpecialEventId : state.currentNormalEventId;
+    const currentEvent = (state.events || []).find(e => e.id === targetEventId);
+    if (!currentEvent) {
+      alert('出力するイベントがありません');
+      return;
+    }
+
+    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\n`;
+
+    if (mode === 'special') {
+      const evEntries = (state.entries || []).filter(e => e.eventId === targetEventId);
+      csvStr += `品名,区分,メモ,金額\n`;
+      evEntries.forEach(e => {
+        const amt = (e.type === '特別費支出') ? -e.amount : e.amount;
+        csvStr += `"${e.itemName || ''}","${e.type}","${e.memo || ''}",${amt}\n`;
+      });
+    } else {
+      csvStr += `#,メンバー名,チーム名,参加費,駐車場代,購入物立替,差引精算額,受領状態\n`;
+      const stData = (state.eventSettlements && state.eventSettlements[targetEventId]) ? state.eventSettlements[targetEventId] : {};
+      let idx = 1;
+      (state.members || []).forEach(m => {
+        const mData = stData[m] || { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+        if (mData.excluded) return;
+        const team = (state.memberTeams && state.memberTeams[m]) ? state.memberTeams[m] : 'Aチーム';
+        const net = (mData.fee || 0) + (mData.parking || 0) - (mData.purchase || 0);
+        csvStr += `${idx++},"${m}","${team}",${mData.fee || 0},${mData.parking || 0},${mData.purchase || 0},${net},"${mData.paid ? '受領済' : '未'}"\n`;
+      });
+    }
+
+    const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `精算_${currentEvent.name}_${currentEvent.date}.csv`;
+    link.click();
+  }
+
+  function clearAllData() {
+    if (!isAdmin) return;
+    if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
+      state = { adminPassword: state.adminPassword || DEFAULT_ADMIN_PASSWORD, members: [], memberTeams: {}, eventSettlements: {}, events: [], entries: [], currentNormalEventId: null, currentSpecialEventId: null };
+      saveData();
+    }
+  }
+
+  function escapeHtml(str) {
+    return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  }
+</script>
+
+</body>
+</html>
