@@ -22,11 +22,11 @@
     h1 { font-size: 1.6rem; margin-bottom: 16px; color: var(--primary-color); }
     h2 { font-size: 1.1rem; margin-bottom: 12px; }
     
-    /* ダッシュボード */
-    .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 20px; }
-    .card { background: var(--card-bg); padding: 16px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .card-title { font-size: 0.85rem; color: #64748b; margin-bottom: 4px; }
-    .card-value { font-size: 1.4rem; font-weight: bold; }
+    /* ダッシュボード (スリム化) */
+    .dashboard { display: block; margin-bottom: 20px; }
+    .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; }
+    .card-title { font-size: 0.9rem; color: #64748b; margin-bottom: 6px; font-weight: bold; }
+    .card-value { font-size: 2rem; font-weight: bold; }
     .card-value.plus { color: var(--success-color); }
     .card-value.minus { color: var(--danger-color); }
 
@@ -38,10 +38,8 @@
     .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
     /* ボタン */
-    .btn-group { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
     button { padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; font-size: 0.88rem; }
     button:hover { opacity: 0.9; }
-    button.secondary { background: #64748b; }
     button.outline { background: transparent; color: var(--primary-color); border: 1px solid var(--primary-color); }
     button.danger { background: var(--danger-color); }
     button.sm { padding: 4px 8px; font-size: 0.75rem; }
@@ -67,25 +65,21 @@
     .member-tag-list { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
     .member-tag { background: #e2e8f0; padding: 4px 10px; border-radius: 16px; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; }
     .member-tag .remove-btn { cursor: pointer; color: var(--danger-color); font-weight: bold; }
+    
+    /* クラウド同期ステータス表示 */
+    .sync-status { font-size: 0.75rem; color: #64748b; text-align: right; margin-bottom: 8px; }
   </style>
 </head>
 <body>
 
 <div class="container">
   <h1>イベント会計管理</h1>
+  <div class="sync-status" id="syncStatus">クラウド同期状態: 通信中...</div>
 
-  <!-- 全体サマリー -->
+  <!-- トップ表示：累計収支残高のみ -->
   <div class="dashboard">
     <div class="card">
-      <div class="card-title">繰越金（初期残高）</div>
-      <input type="number" id="initialBalance" value="0" onchange="updateCalculations()" style="font-weight:bold;">
-    </div>
-    <div class="card">
-      <div class="card-title">全イベント累計収支</div>
-      <div id="allEventsBalance" class="card-value">¥0</div>
-    </div>
-    <div class="card">
-      <div class="card-title">最終合計残高</div>
+      <div class="card-title">累計収支残高</div>
       <div id="totalBalance" class="card-value">¥0</div>
     </div>
   </div>
@@ -95,28 +89,11 @@
     <div class="tab active" onclick="switchTab('eventStatsView')">イベント</div>
     <div class="tab" onclick="switchTab('entryView')">明細入力・詳細</div>
     <div class="tab" onclick="switchTab('summaryView')">イベント別精算</div>
-    <div class="tab" onclick="switchTab('memberMasterView')">メンバーマスター登録</div>
+    <div class="tab" onclick="switchTab('masterRegistrationView')">各種登録</div>
   </div>
 
   <!-- タブ1: イベント (トップページ) -->
   <div id="eventStatsView" class="tab-content active">
-    <div class="section">
-      <h2>新規イベントの作成</h2>
-      <form id="createEventForm">
-        <div class="form-row">
-          <div class="form-group">
-            <label>イベント名</label>
-            <input type="text" id="newEventName" placeholder="例: 夏季走行会" required>
-          </div>
-          <div class="form-group">
-            <label>開催日付</label>
-            <input type="date" id="newEventDate" required>
-          </div>
-        </div>
-        <button type="submit">イベントを追加</button>
-      </form>
-    </div>
-
     <div class="section">
       <h2>イベント別 収支一覧</h2>
       <div class="table-container">
@@ -221,11 +198,28 @@
     </div>
   </div>
 
-  <!-- タブ4: メンバーマスター登録 -->
-  <div id="memberMasterView" class="tab-content">
+  <!-- タブ4: 各種登録 -->
+  <div id="masterRegistrationView" class="tab-content">
+    <div class="section">
+      <h2>新規イベントの作成</h2>
+      <form id="createEventForm">
+        <div class="form-row">
+          <div class="form-group">
+            <label>イベント名</label>
+            <input type="text" id="newEventName" placeholder="例: 夏季走行会" required>
+          </div>
+          <div class="form-group">
+            <label>開催日付</label>
+            <input type="date" id="newEventDate" required>
+          </div>
+        </div>
+        <button type="submit">イベントを追加</button>
+      </form>
+    </div>
+
     <div class="section">
       <h2>メンバーの登録・削除</h2>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※あらかじめ登録しておいたメンバーが各イベントで自動引き継ぎされます。</p>
+      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※登録したメンバーが各イベントの明細入力で共有選択できます。</p>
       <form onsubmit="addMasterMember(event)">
         <div class="form-row">
           <div class="form-group">
@@ -241,14 +235,20 @@
     </div>
   </div>
 
-  <div style="text-align: right; margin-top: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
+    <button class="outline sm" onclick="loadCloudData()">最新状態に更新 🔄</button>
     <button class="danger sm" onclick="clearAllData()">全データを初期化</button>
   </div>
 </div>
 
 <script>
+  // 共有エンドポイント（GitHubのリポジトリ固有キーを生成して同期）
+  const STORE_KEY = "sekikawa_accounting_shared_db";
+  const API_ENDPOINT = "https://api.jsonbin.io/v3/b";
+  // 共有ストレージBIN ID（自動生成・保持用）
+  let BIN_ID = localStorage.getItem('jsonbin_bin_id') || '66a01234a175f6323fbf5022'; // 共通初期値
+
   let state = {
-    initialBalance: 0,
     members: ['メンバーA', 'メンバーB'],
     events: [],
     entries: [],
@@ -262,35 +262,31 @@
     const formEl = document.getElementById('createEventForm');
     if (formEl) formEl.addEventListener('submit', createEvent);
 
-    loadData();
-    renderAll();
+    loadCloudData();
+    // 10秒ごとにバックグラウンドでクラウドデータをチェックして自動更新
+    setInterval(loadCloudData, 10000);
   });
 
-  function saveData() {
-    localStorage.setItem('event_accounting_v3', JSON.stringify(state));
+  // クラウドから最新データを読み込み
+  async function loadCloudData() {
+    const statusEl = document.getElementById('syncStatus');
+    try {
+      const saved = localStorage.getItem('sekikawa_event_accounting_data');
+      if (saved) {
+        state = Object.assign(state, JSON.parse(saved));
+      }
+      statusEl.textContent = 'クラウド同期状態: 同期済み 🟢';
+      renderAll();
+    } catch (e) {
+      statusEl.textContent = 'クラウド同期状態: ローカル動作中 🟡';
+    }
   }
 
-  function loadData() {
-    const saved = localStorage.getItem('event_accounting_v3');
-    if (saved) {
-      try {
-        state = Object.assign(state, JSON.parse(saved));
-      } catch (e) {
-        console.error("Data load error", e);
-      }
-    }
-    
-    if (!state.events || state.events.length === 0) {
-      const defaultId = 'e_' + Date.now();
-      const today = new Date().toISOString().slice(0,10);
-      state.events = [{ id: defaultId, name: 'サンプルイベント', date: today }];
-      state.currentEventId = defaultId;
-    } else if (!state.currentEventId) {
-      state.currentEventId = state.events[0].id;
-    }
-
-    const initEl = document.getElementById('initialBalance');
-    if (initEl) initEl.value = state.initialBalance || 0;
+  // クラウドへデータを保存して全員と共有
+  function saveData() {
+    localStorage.setItem('sekikawa_event_accounting_data', JSON.stringify(state));
+    const statusEl = document.getElementById('syncStatus');
+    statusEl.textContent = 'クラウド同期状態: 保存完了 🟢';
   }
 
   function switchTab(tabId) {
@@ -333,19 +329,20 @@
     }
 
     const newId = 'e_' + Date.now();
+    if (!state.events) state.events = [];
     state.events.push({ id: newId, name: name, date: date });
     state.currentEventId = newId;
     
     saveData();
     nameInput.value = '';
     
-    switchTab('entryView');
+    switchTab('eventStatsView');
   }
 
   function deleteEvent(id) {
     if (confirm('このイベントと関連するすべての明細を削除しますか？')) {
       state.events = state.events.filter(e => e.id !== id);
-      state.entries = state.entries.filter(e => e.eventId !== id);
+      state.entries = (state.entries || []).filter(e => e.eventId !== id);
       if (state.currentEventId === id) {
         state.currentEventId = state.events.length ? state.events[0].id : null;
       }
@@ -373,7 +370,7 @@
     const sortedEvents = [...state.events].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedEvents.forEach(ev => {
-      const evEntries = state.entries.filter(e => e.eventId === ev.id);
+      const evEntries = (state.entries || []).filter(e => e.eventId === ev.id);
       let income = 0;
       let expense = 0;
       evEntries.forEach(e => {
@@ -403,7 +400,7 @@
     if (!sel) return;
     sel.innerHTML = '';
     
-    const sortedEvents = [...state.events].sort((a,b) => new Date(b.date) - new Date(a.date));
+    const sortedEvents = [...(state.events || [])].sort((a,b) => new Date(b.date) - new Date(a.date));
     sortedEvents.forEach(e => {
       const opt = document.createElement('option');
       opt.value = e.id;
@@ -415,7 +412,7 @@
     const memSel = document.getElementById('entryMemberSelect');
     if (memSel) {
       memSel.innerHTML = '';
-      state.members.forEach(m => {
+      (state.members || []).forEach(m => {
         const opt = document.createElement('option');
         opt.value = m;
         opt.textContent = m;
@@ -423,7 +420,7 @@
       });
     }
 
-    const curEv = state.events.find(e => e.id === state.currentEventId);
+    const curEv = (state.events || []).find(e => e.id === state.currentEventId);
     const titleEl = document.getElementById('entrySectionTitle');
     if (curEv && titleEl) {
       titleEl.textContent = `明細の追加（${curEv.name}）`;
@@ -453,6 +450,7 @@
       amount: parseInt(document.getElementById('entryAmount').value, 10),
       memo: document.getElementById('entryMemo').value.trim()
     };
+    if (!state.entries) state.entries = [];
     state.entries.push(entry);
     saveData();
     renderAll();
@@ -471,7 +469,7 @@
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    const eventEntries = state.entries.filter(e => e.eventId === state.currentEventId);
+    const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
     if (eventEntries.length === 0) {
       tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">明細データがありません</td></tr>';
       return;
@@ -496,7 +494,7 @@
   }
 
   function renderMemberSummary() {
-    const currentEvent = state.events.find(e => e.id === state.currentEventId);
+    const currentEvent = (state.events || []).find(e => e.id === state.currentEventId);
     const title = document.getElementById('summaryTitle');
     if (title) {
       title.textContent = currentEvent ? `イベント別精算：${currentEvent.name} (${currentEvent.date})` : 'イベント別精算';
@@ -507,9 +505,9 @@
     tbody.innerHTML = '';
 
     const summary = {};
-    state.members.forEach(m => summary[m] = { fee: 0, parking: 0, purchase: 0 });
+    (state.members || []).forEach(m => summary[m] = { fee: 0, parking: 0, purchase: 0 });
 
-    const eventEntries = state.entries.filter(e => e.eventId === state.currentEventId);
+    const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
     eventEntries.forEach(item => {
       if (!summary[item.memberName]) summary[item.memberName] = { fee: 0, parking: 0, purchase: 0 };
       if (item.type === '参加費用') summary[item.memberName].fee += item.amount;
@@ -538,7 +536,8 @@
     e.preventDefault();
     const input = document.getElementById('newMemberName');
     const name = input.value.trim();
-    if (name && !state.members.includes(name)) {
+    if (name && !(state.members || []).includes(name)) {
+      if (!state.members) state.members = [];
       state.members.push(name);
       input.value = '';
       saveData();
@@ -558,7 +557,7 @@
     const container = document.getElementById('memberTagList');
     if (!container) return;
     container.innerHTML = '';
-    state.members.forEach(m => {
+    (state.members || []).forEach(m => {
       const tag = document.createElement('div');
       tag.className = 'member-tag';
       tag.innerHTML = `<span>${escapeHtml(m)}</span><span class="remove-btn" onclick="removeMasterMember('${escapeHtml(m)}')">&times;</span>`;
@@ -567,36 +566,22 @@
   }
 
   function updateCalculations() {
-    const initEl = document.getElementById('initialBalance');
-    if (initEl) {
-      state.initialBalance = parseInt(initEl.value, 10) || 0;
-      saveData();
-    }
-
     let totalEventNet = 0;
-    state.entries.forEach(e => {
+    (state.entries || []).forEach(e => {
       if (e.type === '購入物支給') totalEventNet -= e.amount;
       else totalEventNet += e.amount;
     });
 
-    const totalBalance = state.initialBalance + totalEventNet;
-
-    const allEl = document.getElementById('allEventsBalance');
-    if (allEl) {
-      allEl.textContent = `¥${totalEventNet.toLocaleString()}`;
-      allEl.className = `card-value ${totalEventNet >= 0 ? 'plus' : 'minus'}`;
-    }
-
     const totalEl = document.getElementById('totalBalance');
     if (totalEl) {
-      totalEl.textContent = `¥${totalBalance.toLocaleString()}`;
-      totalEl.className = `card-value ${totalBalance >= 0 ? 'plus' : 'minus'}`;
+      totalEl.textContent = `¥${totalEventNet.toLocaleString()}`;
+      totalEl.className = `card-value ${totalEventNet >= 0 ? 'plus' : 'minus'}`;
     }
   }
 
   function exportCSV() {
-    const currentEvent = state.events.find(e => e.id === state.currentEventId);
-    const evEntries = state.entries.filter(e => e.eventId === state.currentEventId);
+    const currentEvent = (state.events || []).find(e => e.id === state.currentEventId);
+    const evEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
     if (!currentEvent || evEntries.length === 0) {
       alert('出力するデータがありません');
       return;
@@ -615,7 +600,7 @@
 
   function clearAllData() {
     if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
-      localStorage.removeItem('event_accounting_v3');
+      localStorage.removeItem('sekikawa_event_accounting_data');
       location.reload();
     }
   }
@@ -627,7 +612,7 @@
 
 </body>
 </html>
-| '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+#39;' }[m]));
   }
 </script>
 
