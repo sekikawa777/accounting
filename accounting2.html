@@ -22,7 +22,7 @@
     h1 { font-size: 1.6rem; margin-bottom: 16px; color: var(--primary-color); }
     h2 { font-size: 1.1rem; margin-bottom: 12px; }
     
-    /* ダッシュボード (スリム化) */
+    /* ダッシュボード */
     .dashboard { display: block; margin-bottom: 20px; }
     .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; }
     .card-title { font-size: 0.9rem; color: #64748b; margin-bottom: 6px; font-weight: bold; }
@@ -35,7 +35,7 @@
     .form-group { margin-bottom: 12px; }
     label { display: block; font-size: 0.85rem; font-weight: bold; margin-bottom: 4px; }
     input, select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; }
-    .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
+    .form-row { display: grid; grid-spacing: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
     /* ボタン */
     button { padding: 8px 16px; border: none; border-radius: 6px; background: var(--primary-color); color: white; font-weight: bold; cursor: pointer; font-size: 0.88rem; }
@@ -69,12 +69,16 @@
     /* クラウド同期ステータス表示 */
     .sync-status { font-size: 0.75rem; color: #64748b; text-align: right; margin-bottom: 8px; }
   </style>
+
+  <!-- Firebase SDK の読み込み -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
 </head>
 <body>
 
 <div class="container">
   <h1>イベント会計管理</h1>
-  <div class="sync-status" id="syncStatus">クラウド同期状態: 通信中...</div>
+  <div class="sync-status" id="syncStatus">クラウド同期状態: 接続中...</div>
 
   <!-- トップ表示：累計収支残高のみ -->
   <div class="dashboard">
@@ -236,14 +240,21 @@
   </div>
 
   <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 20px;">
-    <button class="outline sm" onclick="loadCloudData()">最新状態に更新 🔄</button>
+    <button class="outline sm" onclick="manualSync()">最新状態に更新 🔄</button>
     <button class="danger sm" onclick="clearAllData()">全データを初期化</button>
   </div>
 </div>
 
 <script>
-  // 無料の共有ストレージAPI（全端末で共通のデータストレージを参照）
-  const SYNC_API_URL = "https://kvdb.io/6k9d7X1m82Y3pQ4z5W6e7R/sekikawa_accounting_v1";
+  // 即時利用可能な公共クラウドDB設定
+  const firebaseConfig = {
+    databaseURL: "https://sekikawa-accounting-default-rtdb.firebaseio.com"
+  };
+
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.database();
+  const dbRef = db.ref("shared_accounting_data");
 
   let state = {
     members: ['メンバーA', 'メンバーB'],
@@ -259,62 +270,45 @@
     const formEl = document.getElementById('createEventForm');
     if (formEl) formEl.addEventListener('submit', createEvent);
 
-    loadCloudData();
-    // 8秒ごとに自動更新チェック
-    setInterval(loadCloudData, 8000);
+    // リアルタイムリスナー設定 (クラウドで変化があったら即自動更新)
+    dbRef.on('value', (snapshot) => {
+      const statusEl = document.getElementById('syncStatus');
+      const data = snapshot.val();
+      if (data) {
+        state = data;
+        if (!state.members) state.members = [];
+        if (!state.events) state.events = [];
+        if (!state.entries) state.entries = [];
+      }
+      statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+      renderAll();
+    }, (error) => {
+      const statusEl = document.getElementById('syncStatus');
+      statusEl.textContent = 'クラウド同期状態: ローカル動作中 🟡';
+    });
   });
 
-  // クラウドから最新データを読み込み
-  async function loadCloudData() {
+  // クラウドへのデータ書き込み
+  function saveData() {
     const statusEl = document.getElementById('syncStatus');
-    try {
-      const res = await fetch(SYNC_API_URL);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && typeof data === 'object') {
-          state = data;
-          if (!state.members) state.members = [];
-          if (!state.events) state.events = [];
-          if (!state.entries) state.entries = [];
-          statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
-          renderAll();
-          return;
-        }
+    statusEl.textContent = 'クラウド同期状態: 同期中... ⏳';
+    
+    dbRef.set(state, (error) => {
+      if (error) {
+        statusEl.textContent = 'クラウド同期状態: 保存エラー 🔴';
+      } else {
+        statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
       }
-      throw new Error('No cloud data');
-    } catch (e) {
-      statusEl.textContent = 'クラウド同期状態: 送受信待機中 🟡';
-      // フォールバック（ローカル）
-      const saved = localStorage.getItem('sekikawa_event_accounting_data');
-      if (saved) {
-        try { state = Object.assign(state, JSON.parse(saved)); } catch (err) {}
-      }
-      renderAll();
-    }
+    });
   }
 
-  // クラウドへデータを保存して全員と共有
-  async function saveData() {
-    const statusEl = document.getElementById('syncStatus');
-    statusEl.textContent = 'クラウド同期状態: 保存中... ⏳';
-    
-    // ローカルにも保険保存
-    localStorage.setItem('sekikawa_event_accounting_data', JSON.stringify(state));
-
-    try {
-      const res = await fetch(SYNC_API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(state)
-      });
-      if (res.ok) {
-        statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
-      } else {
-        statusEl.textContent = 'クラウド同期状態: ローカル保存完了 🟡';
-      }
-    } catch (e) {
-      statusEl.textContent = 'クラウド同期状態: ローカル保存完了 🟡';
-    }
+  function manualSync() {
+    dbRef.once('value').then((snapshot) => {
+      const data = snapshot.val();
+      if (data) state = data;
+      renderAll();
+      document.getElementById('syncStatus').textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+    });
   }
 
   function switchTab(tabId) {
@@ -630,6 +624,16 @@
     if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
       state = { members: [], events: [], entries: [], currentEventId: null };
       saveData();
+    }
+  }
+
+  function escapeHtml(str) {
+    return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  }
+</script>
+
+</body>
+</html>
       location.reload();
     }
   }
