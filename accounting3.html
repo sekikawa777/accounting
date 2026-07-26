@@ -17,13 +17,12 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: var(--bg-color); color: var(--text-color); padding: 16px; line-height: 1.5; }
-    .container { max-width: 950px; margin: 0 auto; }
+    .container { max-width: 980px; margin: 0 auto; }
     
     h1 { font-size: 1.6rem; margin-bottom: 16px; color: var(--primary-color); }
     h2 { font-size: 1.1rem; margin-bottom: 12px; }
     
-    .dashboard { display: block; margin-bottom: 20px; }
-    .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; }
+    .card { background: var(--card-bg); padding: 20px; border-radius: 8px; border: 1px solid var(--border-color); box-shadow: 0 1px 3px rgba(0,0,0,0.05); text-align: center; margin-bottom: 20px; }
     .card-title { font-size: 0.9rem; color: #64748b; margin-bottom: 6px; font-weight: bold; }
     .card-value { font-size: 2rem; font-weight: bold; }
     .card-value.plus { color: var(--success-color); }
@@ -35,10 +34,6 @@
     input, select { width: 100%; padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 6px; font-size: 0.95rem; }
     .form-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
 
-    .currency-input-wrapper { display: flex; align-items: center; border: 1px solid var(--border-color); border-radius: 6px; background: #fff; padding-left: 10px; }
-    .currency-symbol { font-weight: bold; color: #64748b; margin-right: 4px; }
-    .currency-input-wrapper input { border: none; outline: none; padding: 8px 8px 8px 0; }
-
     .radio-group { display: flex; gap: 16px; align-items: center; margin-top: 6px; }
     .radio-group label { display: flex; align-items: center; gap: 4px; font-weight: normal; cursor: pointer; }
 
@@ -48,15 +43,86 @@
     button.danger { background: var(--danger-color); }
     button.sm { padding: 4px 8px; font-size: 0.75rem; }
 
+    /* イベント選択エリアと横並び収支表示 */
+    .event-selector-header {
+      display: flex;
+      align-items: flex-end;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    .event-balance-badge {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-weight: bold;
+      font-size: 1.05rem;
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      margin-bottom: 12px;
+    }
+
+    /* チーム名カラー（赤・青を使わない色分け） */
+    .team-select {
+      font-weight: bold;
+      border-radius: 6px;
+      padding: 4px 8px;
+    }
+    .team-Aチーム { background-color: #ecfdf5; color: #047857; border-color: #a7f3d0; }
+    .team-Bチーム { background-color: #f5f3ff; color: #6d28d9; border-color: #ddd6fe; }
+    .team-エンジョイ { background-color: #fff7ed; color: #c2410c; border-color: #ffedd5; }
+    .team-エンジョイ2 { background-color: #f0fdf4; color: #15803d; border-color: #bbf7d0; }
+    .team-オッサンズ { background-color: #fefce8; color: #a16207; border-color: #fef08a; }
+    .team-ピットサポート { background-color: #f1f5f9; color: #475569; border-color: #cbd5e1; }
+
+    /* 丸型チェックボタン */
+    .round-check-btn {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: 2px solid #cbd5e1;
+      background: #ffffff;
+      color: #94a3b8;
+      font-weight: bold;
+      font-size: 1rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      padding: 0;
+    }
+    .round-check-btn.checked {
+      background: var(--primary-color);
+      border-color: var(--primary-color);
+      color: #ffffff;
+    }
+
+    /* チェック時の名前青色変化 */
+    .member-name-text.paid {
+      color: var(--primary-color);
+      font-weight: bold;
+    }
+
     .table-container { overflow-x: auto; }
     table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.88rem; }
-    th, td { border-bottom: 1px solid var(--border-color); padding: 8px 10px; text-align: left; }
+    th, td { border-bottom: 1px solid var(--border-color); padding: 8px 10px; text-align: left; vertical-align: middle; }
     th { background: #f1f5f9; font-weight: 600; }
-    .type-badge { display: inline-block; padding: 2px 8px; border-radius: 12px; font-size: 0.75rem; font-weight: bold; }
-    .type-fee { background: #dbeafe; color: #1e40af; }
-    .type-parking { background: #fef3c7; color: #92400e; }
-    .type-purchase { background: #fce7f3; color: #9d174d; }
-    .type-special { background: #e0e7ff; color: #3730a3; border: 1px solid #c7d2fe; }
+
+    /* テーブル内入力スタイル */
+    .table-input {
+      padding: 6px 8px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 0.88rem;
+      width: 100%;
+    }
+    .table-input.amount-expense {
+      color: var(--danger-color);
+      font-weight: bold;
+    }
+    .table-input.amount-income {
+      color: var(--text-color);
+      font-weight: bold;
+    }
 
     .tabs { display: flex; border-bottom: 2px solid var(--border-color); margin-bottom: 20px; overflow-x: auto; }
     .tab { padding: 10px 16px; cursor: pointer; font-weight: bold; color: #64748b; border-bottom: 2px solid transparent; margin-bottom: -2px; white-space: nowrap; font-size: 0.9rem; }
@@ -68,6 +134,7 @@
     .member-item { display: flex; align-items: center; justify-content: space-between; background: #f1f5f9; padding: 8px 12px; border-radius: 6px; }
     
     .sync-status { font-size: 0.75rem; color: #64748b; text-align: right; margin-bottom: 8px; }
+    .table-select { padding: 4px 8px; font-size: 0.85rem; }
   </style>
 
   <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
@@ -79,23 +146,21 @@
   <h1>イベント会計管理</h1>
   <div class="sync-status" id="syncStatus">クラウド同期状態: 接続中...</div>
 
-  <div class="dashboard">
-    <div class="card">
-      <div class="card-title">累計収支残高</div>
-      <div id="totalBalance" class="card-value">¥0</div>
-    </div>
-  </div>
-
   <!-- タブ定義 -->
   <div class="tabs">
     <div class="tab active" onclick="switchTab('eventStatsView')">イベント</div>
-    <div class="tab" onclick="switchTab('entryView')">特別費精算</div>
     <div class="tab" onclick="switchTab('summaryView')">イベント別精算</div>
+    <div class="tab" onclick="switchTab('entryView')">特別費精算</div>
     <div class="tab" onclick="switchTab('masterRegistrationView')">各種登録</div>
   </div>
 
   <!-- タブ1: イベント -->
   <div id="eventStatsView" class="tab-content active">
+    <div class="card">
+      <div class="card-title">累計総合収支</div>
+      <div id="totalBalance" class="card-value">¥0</div>
+    </div>
+
     <div class="section">
       <h2>イベント別 収支一覧</h2>
       <div class="table-container">
@@ -117,108 +182,77 @@
     </div>
   </div>
 
-  <!-- タブ2: 特別費精算 -->
-  <div id="entryView" class="tab-content">
+  <!-- タブ2: イベント別精算 -->
+  <div id="summaryView" class="tab-content">
     <div class="section">
-      <div class="form-group" style="max-width: 350px;">
-        <label>特別費を選択</label>
-        <select id="activeEventSelect" onchange="onActiveEventChange()"></select>
+      <div class="event-selector-header">
+        <div class="form-group" style="max-width: 350px; margin-bottom:0; flex-grow: 1;">
+          <label>通常イベントを選択</label>
+          <select id="normalEventSelect" onchange="onNormalEventChange()"></select>
+        </div>
+        <div id="normalEventBalance" class="event-balance-badge">イベント収支: ¥0</div>
       </div>
     </div>
 
     <div class="section">
-      <h2 id="entrySectionTitle">特別費明細の追加</h2>
-      <form id="accountingForm" onsubmit="addEntry(event)">
-        <div class="form-row">
-          <div class="form-group">
-            <label>メンバー名</label>
-            <select id="entryMemberSelect" required></select>
-          </div>
-          <div class="form-group">
-            <label>チーム名</label>
-            <input type="text" id="entryTeamName" placeholder="チーム名を入力">
-          </div>
-          <div class="form-group">
-            <label>区分</label>
-            <select id="entryType" onchange="toggleAmountInputMode()">
-              <option value="参加費用">参加費用 (収入)</option>
-              <option value="駐車場代">駐車場代 (収入)</option>
-              <option value="購入物支給">購入物・立替費 (支出)</option>
-            </select>
-          </div>
-          
-          <div class="form-group">
-            <label>金額</label>
-            <!-- 参加費選択肢 -->
-            <select id="entryAmountSelectFee">
-              <option value="0">0円</option>
-              <option value="500">500円</option>
-              <option value="1000">1000円</option>
-            </select>
-            <!-- 駐車場代選択肢 -->
-            <select id="entryAmountSelectParking" style="display:none;">
-              <option value="0">0円</option>
-              <option value="1000">1000円</option>
-            </select>
-            <!-- 立替費（手入力） -->
-            <div id="entryAmountCustomWrapper" class="currency-input-wrapper" style="display:none;">
-              <span class="currency-symbol">￥</span>
-              <input type="number" id="entryAmountCustom" min="0" placeholder="0">
-            </div>
-          </div>
-        </div>
-        <div class="form-group">
-          <label>メモ / 品名</label>
-          <input type="text" id="entryMemo" placeholder="例: 支出詳細、備品代など">
-        </div>
-        <button type="submit">追加する</button>
-      </form>
-    </div>
-
-    <div class="section">
-      <div style="display: flex; justify-content: space-between; align-items: center;">
-        <h2>明細一覧</h2>
-        <button class="outline sm" onclick="exportCSV()">CSV出力</button>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+        <h2 id="summaryTitle">メンバー別 精算状況</h2>
+        <button class="outline sm" onclick="exportCSV('normal')">CSV出力</button>
       </div>
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>メンバー</th>
+              <th style="width: 40px; text-align: center;">#</th>
+              <th>メンバー名</th>
               <th>チーム名</th>
-              <th>区分</th>
-              <th>メモ</th>
-              <th>金額</th>
-              <th>操作</th>
+              <th>参加費</th>
+              <th>駐車場代</th>
+              <th>購入物立替</th>
+              <th>差引 精算額</th>
+              <th style="text-align:center;">受領</th>
+              <th style="text-align:center;">操作</th>
             </tr>
           </thead>
-          <tbody id="entriesTableBody"></tbody>
+          <tbody id="memberSummaryBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <!-- タブ3: イベント別精算 -->
-  <div id="summaryView" class="tab-content">
+  <!-- タブ3: 特別費精算 -->
+  <div id="entryView" class="tab-content">
     <div class="section">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-        <h2 id="summaryTitle">イベント別精算</h2>
+      <div class="event-selector-header">
+        <div class="form-group" style="max-width: 350px; margin-bottom:0; flex-grow: 1;">
+          <label>特別費を選択</label>
+          <select id="activeEventSelect" onchange="onActiveEventChange()"></select>
+        </div>
+        <div id="specialEventBalance" class="event-balance-badge">イベント収支: ¥0</div>
       </div>
-      <p style="font-size: 0.85rem; color: #64748b; margin-bottom: 12px;">※プラス（徴収）はイベント側の回収額、マイナス（支払）はイベントからメンバーへ受け渡す額です。</p>
+    </div>
+
+    <div class="section">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+        <h2 id="entrySectionTitle">特別費 明細一覧</h2>
+        <button class="outline sm" onclick="exportCSV('special')">CSV出力</button>
+      </div>
       <div class="table-container">
         <table>
           <thead>
             <tr>
-              <th>メンバー名</th>
-              <th>チーム名</th>
-              <th>参加費</th>
-              <th>駐車場代</th>
-              <th>購入物・立替</th>
-              <th>差引 精算額</th>
+              <th style="width: 25%;">品名</th>
+              <th style="width: 20%;">区分</th>
+              <th style="width: 25%;">メモ</th>
+              <th style="width: 15%;">金額</th>
+              <th style="width: 15%;">操作</th>
             </tr>
           </thead>
-          <tbody id="memberSummaryBody"></tbody>
+          <tbody id="entriesTableBody"></tbody>
         </table>
+      </div>
+      <div style="margin-top: 12px;">
+        <button class="outline" onclick="addEmptySpecialEntry()">＋ 項目を追加</button>
       </div>
     </div>
   </div>
@@ -231,7 +265,7 @@
         <div class="form-row">
           <div class="form-group">
             <label>イベント名</label>
-            <input type="text" id="newEventName" placeholder="例: 特別イベント/通常走行会" required>
+            <input type="text" id="newEventName" placeholder="例: 通常走行会 / 特別精算" required>
           </div>
           <div class="form-group">
             <label>開催日付</label>
@@ -250,7 +284,7 @@
     </div>
 
     <div class="section">
-      <h2>メンバーの登録・編集・削除</h2>
+      <h2>メンバーの登録・編集・削除（共通マスター）</h2>
       <form onsubmit="addMasterMember(event)" style="margin-bottom: 15px;">
         <div class="form-row">
           <div class="form-group">
@@ -273,6 +307,8 @@
 </div>
 
 <script>
+  const INITIAL_BALANCE = 60000; // 初期資金 6万円
+
   const firebaseConfig = {
     databaseURL: "https://sekikawa-accounting-default-rtdb.firebaseio.com"
   };
@@ -283,9 +319,12 @@
 
   let state = {
     members: ['メンバーA', 'メンバーB'],
+    memberTeams: {}, 
+    eventSettlements: {}, 
     events: [],
     entries: [],
-    currentEventId: null
+    currentNormalEventId: null,
+    currentSpecialEventId: null
   };
 
   document.addEventListener('DOMContentLoaded', () => {
@@ -301,6 +340,8 @@
       if (data) {
         state = data;
         if (!state.members) state.members = [];
+        if (!state.memberTeams) state.memberTeams = {};
+        if (!state.eventSettlements) state.eventSettlements = {};
         if (!state.events) state.events = [];
         if (!state.entries) state.entries = [];
       }
@@ -353,13 +394,12 @@
   }
 
   function renderAll() {
-    renderEventSelect();
+    renderEventSelects();
     renderEntries();
     renderMemberSummary();
     renderEventStats();
     renderMemberMaster();
     updateCalculations();
-    toggleAmountInputMode();
   }
 
   function createEvent(e) {
@@ -380,20 +420,25 @@
     const newId = 'e_' + Date.now();
     if (!state.events) state.events = [];
     state.events.push({ id: newId, name: name, date: date, isSpecial: isSpecial });
-    state.currentEventId = newId;
+    
+    if (isSpecial) {
+      state.currentSpecialEventId = newId;
+    } else {
+      state.currentNormalEventId = newId;
+    }
 
     saveData();
     nameInput.value = '';
 
-    switchTab(isSpecial ? 'entryView' : 'eventStatsView');
+    switchTab(isSpecial ? 'entryView' : 'summaryView');
   }
 
   function deleteEvent(id) {
     if (confirm('このイベントと関連するすべての明細を削除しますか？')) {
       state.events = state.events.filter(e => e.id !== id);
       state.entries = (state.entries || []).filter(e => e.eventId !== id);
-      if (state.currentEventId === id) {
-        state.currentEventId = state.events.length ? state.events[0].id : null;
+      if (state.eventSettlements && state.eventSettlements[id]) {
+        delete state.eventSettlements[id];
       }
       saveData();
       renderAll();
@@ -401,14 +446,42 @@
   }
 
   function openEventDetails(id) {
-    state.currentEventId = id;
-    saveData();
     const ev = (state.events || []).find(e => e.id === id);
     if (ev && ev.isSpecial) {
+      state.currentSpecialEventId = id;
+      saveData();
       switchTab('entryView');
     } else {
+      state.currentNormalEventId = id;
+      saveData();
       switchTab('summaryView');
     }
+  }
+
+  /* イベントの収支集計関数（受領ボタン押下分のみ反映） */
+  function getEventNet(ev) {
+    let income = 0;
+    let expense = 0;
+    if (ev.isSpecial) {
+      const evEntries = (state.entries || []).filter(e => e.eventId === ev.id);
+      evEntries.forEach(e => {
+        if (e.type === '特別費支出') expense += (e.amount || 0);
+        else income += (e.amount || 0);
+      });
+    } else {
+      const stData = (state.eventSettlements && state.eventSettlements[ev.id]) ? state.eventSettlements[ev.id] : {};
+      Object.keys(stData).forEach(mName => {
+        const m = stData[mName];
+        if (m.excluded) return; // 不参加メンバーは除外
+        
+        // ★ 受領（paid）にチェックが入っている場合のみ収支に集計 ★
+        if (m.paid) {
+          income += (m.fee || 0) + (m.parking || 0);
+          expense += (m.purchase || 0);
+        }
+      });
+    }
+    return { income, expense, net: income - expense };
   }
 
   function renderEventStats() {
@@ -424,23 +497,16 @@
     const sortedEvents = [...state.events].sort((a,b) => new Date(b.date) - new Date(a.date));
 
     sortedEvents.forEach(ev => {
-      const evEntries = (state.entries || []).filter(e => e.eventId === ev.id);
-      let income = 0;
-      let expense = 0;
-      evEntries.forEach(e => {
-        if (e.type === '購入物支給') expense += e.amount;
-        else income += e.amount;
-      });
-      const net = income - expense;
+      const calc = getEventNet(ev);
 
       const tr = document.createElement('tr');
       tr.innerHTML = `
         <td>${ev.date}</td>
         <td><span class="type-badge ${ev.isSpecial ? 'type-special' : 'type-fee'}">${ev.isSpecial ? '特別費' : '通常'}</span></td>
         <td><strong>${escapeHtml(ev.name)}</strong></td>
-        <td>¥${income.toLocaleString()}</td>
-        <td>¥${expense.toLocaleString()}</td>
-        <td style="font-weight:bold; color:${net >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">¥${net.toLocaleString()}</td>
+        <td>¥${calc.income.toLocaleString()}</td>
+        <td>¥${calc.expense.toLocaleString()}</td>
+        <td style="font-weight:bold; color:${calc.net >= 0 ? 'var(--success-color)' : 'var(--danger-color)'}">¥${calc.net.toLocaleString()}</td>
         <td>
           <button class="outline sm" onclick="openEventDetails('${ev.id}')">開く</button>
           <button class="danger sm" onclick="deleteEvent('${ev.id}')">削除</button>
@@ -450,116 +516,251 @@
     });
   }
 
-  function renderEventSelect() {
-    const sel = document.getElementById('activeEventSelect');
-    if (!sel) return;
-    sel.innerHTML = '';
+  function renderEventSelects() {
+    const normalSel = document.getElementById('normalEventSelect');
+    const normalEvents = (state.events || []).filter(e => !e.isSpecial).sort((a,b) => new Date(b.date) - new Date(a.date));
+    if (normalSel) {
+      normalSel.innerHTML = '';
+      if (normalEvents.length === 0) {
+        normalSel.innerHTML = '<option value="">通常イベントがありません</option>';
+      } else {
+        normalEvents.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.id;
+          opt.textContent = `${e.date} : ${e.name}`;
+          if (e.id === state.currentNormalEventId) opt.selected = true;
+          normalSel.appendChild(opt);
+        });
+        if (!state.currentNormalEventId && normalEvents.length > 0) {
+          state.currentNormalEventId = normalEvents[0].id;
+        }
+      }
+    }
 
-    // 特別費マークのついたイベントのみを抽出
+    const specialSel = document.getElementById('activeEventSelect');
     const specialEvents = (state.events || []).filter(e => e.isSpecial).sort((a,b) => new Date(b.date) - new Date(a.date));
-
-    if (specialEvents.length === 0) {
-      const opt = document.createElement('option');
-      opt.value = "";
-      opt.textContent = "特別費イベントがありません";
-      sel.appendChild(opt);
-    } else {
-      specialEvents.forEach(e => {
-        const opt = document.createElement('option');
-        opt.value = e.id;
-        opt.textContent = `${e.date} : ${e.name}`;
-        if (e.id === state.currentEventId) opt.selected = true;
-        sel.appendChild(opt);
-      });
+    if (specialSel) {
+      specialSel.innerHTML = '';
+      if (specialEvents.length === 0) {
+        specialSel.innerHTML = '<option value="">特別費イベントがありません</option>';
+      } else {
+        specialEvents.forEach(e => {
+          const opt = document.createElement('option');
+          opt.value = e.id;
+          opt.textContent = `${e.date} : ${e.name}`;
+          if (e.id === state.currentSpecialEventId) opt.selected = true;
+          specialSel.appendChild(opt);
+        });
+        if (!state.currentSpecialEventId && specialEvents.length > 0) {
+          state.currentSpecialEventId = specialEvents[0].id;
+        }
+      }
     }
 
-    const memSel = document.getElementById('entryMemberSelect');
-    if (memSel) {
-      memSel.innerHTML = '';
-      (state.members || []).forEach(m => {
-        const opt = document.createElement('option');
-        opt.value = m;
-        opt.textContent = m;
-        memSel.appendChild(opt);
-      });
-    }
+    const curSpec = (state.events || []).find(e => e.id === state.currentSpecialEventId);
+    const specTitle = document.getElementById('entrySectionTitle');
+    if (curSpec && specTitle) specTitle.textContent = `特別費 明細一覧（${curSpec.name}）`;
+  }
 
-    const curEv = (state.events || []).find(e => e.id === state.currentEventId);
-    const titleEl = document.getElementById('entrySectionTitle');
-    if (curEv && titleEl) {
-      titleEl.textContent = `特別費明細の追加（${curEv.name}）`;
+  function onNormalEventChange() {
+    const sel = document.getElementById('normalEventSelect');
+    if (sel && sel.value) {
+      state.currentNormalEventId = sel.value;
+      saveData();
+      renderAll();
     }
   }
 
   function onActiveEventChange() {
     const sel = document.getElementById('activeEventSelect');
     if (sel && sel.value) {
-      state.currentEventId = sel.value;
+      state.currentSpecialEventId = sel.value;
       saveData();
       renderAll();
     }
   }
 
-  function toggleAmountInputMode() {
-    const type = document.getElementById('entryType').value;
-    const feeSel = document.getElementById('entryAmountSelectFee');
-    const parkSel = document.getElementById('entryAmountSelectParking');
-    const customWrapper = document.getElementById('entryAmountCustomWrapper');
-
-    feeSel.style.display = 'none';
-    parkSel.style.display = 'none';
-    customWrapper.style.display = 'none';
-
-    if (type === '参加費用') {
-      feeSel.style.display = 'block';
-    } else if (type === '駐車場代') {
-      parkSel.style.display = 'block';
-    } else {
-      customWrapper.style.display = 'flex';
-    }
+  function updateMemberTeam(memberName, teamName) {
+    if (!state.memberTeams) state.memberTeams = {};
+    state.memberTeams[memberName] = teamName;
+    saveData();
+    renderAll();
   }
 
-  function addEntry(e) {
-    e.preventDefault();
-    if (!state.currentEventId) {
-      alert('対象の特別費イベントを選択してください');
+  function renderMemberSummary() {
+    const currentEvent = (state.events || []).find(e => e.id === state.currentNormalEventId);
+    const title = document.getElementById('summaryTitle');
+    if (title) {
+      title.textContent = currentEvent ? `メンバー別 精算状況（${currentEvent.name}）` : 'メンバー別 精算状況';
+    }
+
+    const tbody = document.getElementById('memberSummaryBody');
+    if (!tbody) return;
+    tbody.innerHTML = '';
+
+    if (!state.currentNormalEventId) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">通常イベントを選択してください</td></tr>';
       return;
     }
 
-    const type = document.getElementById('entryType').value;
-    let amount = 0;
+    const teams = ['Aチーム', 'Bチーム', 'エンジョイ', 'エンジョイ2', 'オッサンズ', 'ピットサポート'];
 
-    if (type === '参加費用') {
-      amount = parseInt(document.getElementById('entryAmountSelectFee').value, 10);
-    } else if (type === '駐車場代') {
-      amount = parseInt(document.getElementById('entryAmountSelectParking').value, 10);
-    } else {
-      amount = parseInt(document.getElementById('entryAmountCustom').value, 10) || 0;
+    if (!state.eventSettlements) state.eventSettlements = {};
+    if (!state.eventSettlements[state.currentNormalEventId]) {
+      state.eventSettlements[state.currentNormalEventId] = {};
+    }
+    const currentSettlement = state.eventSettlements[state.currentNormalEventId];
+
+    let numberIndex = 1;
+
+    (state.members || []).forEach(name => {
+      if (!currentSettlement[name]) {
+        currentSettlement[name] = { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+      }
+      const mData = currentSettlement[name];
+
+      if (mData.excluded) return;
+
+      const currentTeam = (state.memberTeams && state.memberTeams[name]) ? state.memberTeams[name] : 'Aチーム';
+      
+      let teamOptionsHtml = '';
+      teams.forEach(t => {
+        teamOptionsHtml += `<option value="${t}" ${t === currentTeam ? 'selected' : ''}>${t}</option>`;
+      });
+
+      const net = (mData.fee || 0) + (mData.parking || 0) - (mData.purchase || 0);
+
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+        <td style="text-align:center; font-weight:bold; color:#64748b;">${numberIndex++}</td>
+        <td><strong class="member-name-text ${mData.paid ? 'paid' : ''}">${escapeHtml(name)}</strong></td>
+        <td>
+          <select class="table-select team-select team-${escapeHtml(currentTeam)}" onchange="updateMemberTeam('${escapeHtml(name)}', this.value)">
+            ${teamOptionsHtml}
+          </select>
+        </td>
+        <td>
+          <select class="table-select" onchange="updateMemberValue('${escapeHtml(name)}', 'fee', this.value)">
+            <option value="0" ${mData.fee == 0 ? 'selected' : ''}>0円</option>
+            <option value="500" ${mData.fee == 500 ? 'selected' : ''}>500円</option>
+            <option value="1000" ${mData.fee == 1000 ? 'selected' : ''}>1000円</option>
+          </select>
+        </td>
+        <td>
+          <select class="table-select" onchange="updateMemberValue('${escapeHtml(name)}', 'parking', this.value)">
+            <option value="0" ${mData.parking == 0 ? 'selected' : ''}>0円</option>
+            <option value="1000" ${mData.parking == 1000 ? 'selected' : ''}>1000円</option>
+          </select>
+        </td>
+        <td>
+          <input type="number" class="table-select" style="width: 90px; color: var(--danger-color); font-weight: bold;" placeholder="0" value="${mData.purchase || ''}" onchange="updateMemberValue('${escapeHtml(name)}', 'purchase', this.value)">
+        </td>
+        <td style="font-weight:bold; color:${net < 0 ? 'var(--danger-color)' : 'var(--text-color)'}">
+          ${net >= 0 ? `徴収: ¥${net.toLocaleString()}` : `支払: -¥${Math.abs(net).toLocaleString()}`}
+        </td>
+        <td style="text-align:center;">
+          <button class="round-check-btn ${mData.paid ? 'checked' : ''}" onclick="toggleMemberPaid('${escapeHtml(name)}')">
+            ${mData.paid ? '✓' : '〇'}
+          </button>
+        </td>
+        <td style="text-align:center;">
+          <button class="danger sm" onclick="excludeEventMember('${escapeHtml(name)}')">削除</button>
+        </td>
+      `;
+      tbody.appendChild(tr);
+    });
+
+    if (numberIndex === 1) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;">参加メンバーがいません</td></tr>';
+    }
+  }
+
+  function excludeEventMember(memberName) {
+    if (!state.currentNormalEventId) return;
+    if (confirm(`${memberName} さんをこのイベントの精算リストから外しますか？\n（※マスターのメンバーリストからは削除されません）`)) {
+      if (!state.eventSettlements[state.currentNormalEventId]) {
+        state.eventSettlements[state.currentNormalEventId] = {};
+      }
+      if (!state.eventSettlements[state.currentNormalEventId][memberName]) {
+        state.eventSettlements[state.currentNormalEventId][memberName] = { fee: 0, parking: 0, purchase: 0, paid: false };
+      }
+      state.eventSettlements[state.currentNormalEventId][memberName].excluded = true;
+      saveData();
+      renderAll();
+    }
+  }
+
+  function updateMemberValue(memberName, field, value) {
+    if (!state.currentNormalEventId) return;
+    if (!state.eventSettlements[state.currentNormalEventId]) state.eventSettlements[state.currentNormalEventId] = {};
+    if (!state.eventSettlements[state.currentNormalEventId][memberName]) {
+      state.eventSettlements[state.currentNormalEventId][memberName] = { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
     }
 
-    const entry = {
+    state.eventSettlements[state.currentNormalEventId][memberName][field] = parseInt(value, 10) || 0;
+    saveData();
+    renderAll();
+  }
+
+  function toggleMemberPaid(memberName) {
+    if (!state.currentNormalEventId) return;
+    if (!state.eventSettlements[state.currentNormalEventId]) state.eventSettlements[state.currentNormalEventId] = {};
+    if (!state.eventSettlements[state.currentNormalEventId][memberName]) {
+      state.eventSettlements[state.currentNormalEventId][memberName] = { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+    }
+
+    const currentPaid = state.eventSettlements[state.currentNormalEventId][memberName].paid;
+    state.eventSettlements[state.currentNormalEventId][memberName].paid = !currentPaid;
+    saveData();
+    renderAll();
+  }
+
+  /* 特別費の項目追加・保存・削除 */
+  function addEmptySpecialEntry() {
+    if (!state.currentSpecialEventId) {
+      alert('特別費イベントを選択してください');
+      return;
+    }
+
+    const newEntry = {
       id: Date.now(),
-      eventId: state.currentEventId,
-      memberName: document.getElementById('entryMemberSelect').value,
-      teamName: document.getElementById('entryTeamName').value.trim(),
-      type: type,
-      amount: amount,
-      memo: document.getElementById('entryMemo').value.trim()
+      eventId: state.currentSpecialEventId,
+      itemName: '',
+      type: '特別費支出',
+      memo: '',
+      amount: 0
     };
 
     if (!state.entries) state.entries = [];
-    state.entries.push(entry);
+    state.entries.push(newEntry);
     saveData();
     renderAll();
+  }
 
-    document.getElementById('entryAmountCustom').value = '';
-    document.getElementById('entryMemo').value = '';
+  function saveSpecialEntry(id) {
+    const itemEl = document.getElementById(`sp_item_${id}`);
+    const typeEl = document.getElementById(`sp_type_${id}`);
+    const memoEl = document.getElementById(`sp_memo_${id}`);
+    const amountEl = document.getElementById(`sp_amount_${id}`);
+
+    const entry = (state.entries || []).find(e => e.id === id);
+    if (entry) {
+      entry.itemName = itemEl ? itemEl.value.trim() : '';
+      entry.type = typeEl ? typeEl.value : '特別費支出';
+      entry.memo = memoEl ? memoEl.value.trim() : '';
+      entry.amount = amountEl ? (parseInt(amountEl.value, 10) || 0) : 0;
+
+      saveData();
+      renderAll();
+    }
   }
 
   function deleteEntry(id) {
-    state.entries = state.entries.filter(e => e.id !== id);
-    saveData();
-    renderAll();
+    if (confirm('この明細を削除しますか？')) {
+      state.entries = state.entries.filter(e => e.id !== id);
+      saveData();
+      renderAll();
+    }
   }
 
   function renderEntries() {
@@ -567,66 +768,40 @@
     if (!tbody) return;
     tbody.innerHTML = '';
 
-    const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
+    if (!state.currentSpecialEventId) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">特別費イベントを選択してください</td></tr>';
+      return;
+    }
+
+    const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentSpecialEventId);
     if (eventEntries.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">明細データがありません</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">明細データがありません。「＋ 項目を追加」から追加してください</td></tr>';
       return;
     }
 
     eventEntries.forEach(item => {
       const tr = document.createElement('tr');
-      let badgeClass = 'type-fee';
-      let amountSign = '+';
-      if (item.type === '駐車場代') badgeClass = 'type-parking';
-      if (item.type === '購入物支給') { badgeClass = 'type-purchase'; amountSign = '-'; }
-
+      const isExpense = item.type === '特別費支出';
+      
       tr.innerHTML = `
-        <td><strong>${escapeHtml(item.memberName)}</strong></td>
-        <td>${escapeHtml(item.teamName || '-')}</td>
-        <td><span class="type-badge ${badgeClass}">${item.type}</span></td>
-        <td>${escapeHtml(item.memo || '-')}</td>
-        <td style="font-weight:bold;">${amountSign}¥${item.amount.toLocaleString()}</td>
-        <td><button class="danger sm" onclick="deleteEntry(${item.id})">削除</button></td>
-      `;
-      tbody.appendChild(tr);
-    });
-  }
-
-  function renderMemberSummary() {
-    const currentEvent = (state.events || []).find(e => e.id === state.currentEventId);
-    const title = document.getElementById('summaryTitle');
-    if (title) {
-      title.textContent = currentEvent ? `イベント別精算：${currentEvent.name} (${currentEvent.date})` : 'イベント別精算';
-    }
-
-    const tbody = document.getElementById('memberSummaryBody');
-    if (!tbody) return;
-    tbody.innerHTML = '';
-
-    const summary = {};
-    (state.members || []).forEach(m => summary[m] = { teamName: '', fee: 0, parking: 0, purchase: 0 });
-
-    const eventEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
-    eventEntries.forEach(item => {
-      if (!summary[item.memberName]) summary[item.memberName] = { teamName: '', fee: 0, parking: 0, purchase: 0 };
-      if (item.teamName) summary[item.memberName].teamName = item.teamName;
-      if (item.type === '参加費用') summary[item.memberName].fee += item.amount;
-      if (item.type === '駐車場代') summary[item.memberName].parking += item.amount;
-      if (item.type === '購入物支給') summary[item.memberName].purchase += item.amount;
-    });
-
-    Object.keys(summary).forEach(name => {
-      const data = summary[name];
-      const net = (data.fee + data.parking) - data.purchase;
-      const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td><strong>${escapeHtml(name)}</strong></td>
-        <td>${escapeHtml(data.teamName || '-')}</td>
-        <td>¥${data.fee.toLocaleString()}</td>
-        <td>¥${data.parking.toLocaleString()}</td>
-        <td>¥${data.purchase.toLocaleString()}</td>
-        <td style="font-weight:bold; color:${net >= 0 ? 'var(--text-color)' : 'var(--danger-color)'}">
-          ${net >= 0 ? `徴収: ¥${net.toLocaleString()}` : `支払: ¥${Math.abs(net).toLocaleString()}`}
+        <td>
+          <input type="text" id="sp_item_${item.id}" class="table-input" placeholder="例: 備品代" value="${escapeHtml(item.itemName || '')}">
+        </td>
+        <td>
+          <select id="sp_type_${item.id}" class="table-input" onchange="saveSpecialEntry(${item.id})">
+            <option value="特別費支出" ${isExpense ? 'selected' : ''}>特別費支出 (支出)</option>
+            <option value="特別費収入" ${!isExpense ? 'selected' : ''}>特別費収入 (収入)</option>
+          </select>
+        </td>
+        <td>
+          <input type="text" id="sp_memo_${item.id}" class="table-input" placeholder="メモ" value="${escapeHtml(item.memo || '')}">
+        </td>
+        <td>
+          <input type="number" id="sp_amount_${item.id}" class="table-input ${isExpense ? 'amount-expense' : 'amount-income'}" placeholder="0" min="0" value="${item.amount || ''}" onchange="saveSpecialEntry(${item.id})">
+        </td>
+        <td>
+          <button class="outline sm" onclick="saveSpecialEntry(${item.id})">変更</button>
+          <button class="danger sm" onclick="deleteEntry(${item.id})">削除</button>
         </td>
       `;
       tbody.appendChild(tr);
@@ -640,6 +815,8 @@
     if (name && !(state.members || []).includes(name)) {
       if (!state.members) state.members = [];
       state.members.push(name);
+      if (!state.memberTeams) state.memberTeams = {};
+      state.memberTeams[name] = 'Aチーム';
       input.value = '';
       saveData();
       renderAll();
@@ -653,10 +830,10 @@
       const index = state.members.indexOf(oldName);
       if (index !== -1) {
         state.members[index] = trimmed;
-        // 過去の明細データ内の名前も更新
-        (state.entries || []).forEach(e => {
-          if (e.memberName === oldName) e.memberName = trimmed;
-        });
+        if (state.memberTeams && state.memberTeams[oldName]) {
+          state.memberTeams[trimmed] = state.memberTeams[oldName];
+          delete state.memberTeams[oldName];
+        }
         saveData();
         renderAll();
       }
@@ -664,8 +841,9 @@
   }
 
   function removeMasterMember(name) {
-    if (confirm(`${name} さんを削除しますか？`)) {
+    if (confirm(`${name} さんをマスターデータから削除しますか？\n（※すべてのイベントから除外されます）`)) {
       state.members = state.members.filter(m => m !== name);
+      if (state.memberTeams) delete state.memberTeams[name];
       saveData();
       renderAll();
     }
@@ -691,29 +869,59 @@
 
   function updateCalculations() {
     let totalEventNet = 0;
-    (state.entries || []).forEach(e => {
-      if (e.type === '購入物支給') totalEventNet -= e.amount;
-      else totalEventNet += e.amount;
+
+    (state.events || []).forEach(ev => {
+      const calc = getEventNet(ev);
+      totalEventNet += calc.net;
+
+      if (ev.id === state.currentNormalEventId) {
+        const el = document.getElementById('normalEventBalance');
+        if (el) el.textContent = `イベント収支: ¥${calc.net.toLocaleString()}`;
+      }
+      if (ev.id === state.currentSpecialEventId) {
+        const el = document.getElementById('specialEventBalance');
+        if (el) el.textContent = `イベント収支: ¥${calc.net.toLocaleString()}`;
+      }
     });
+
+    const finalBalance = INITIAL_BALANCE + totalEventNet;
 
     const totalEl = document.getElementById('totalBalance');
     if (totalEl) {
-      totalEl.textContent = `¥${totalEventNet.toLocaleString()}`;
-      totalEl.className = `card-value ${totalEventNet >= 0 ? 'plus' : 'minus'}`;
+      totalEl.textContent = `¥${finalBalance.toLocaleString()}`;
+      totalEl.className = `card-value ${finalBalance >= 0 ? 'plus' : 'minus'}`;
     }
   }
 
-  function exportCSV() {
-    const currentEvent = (state.events || []).find(e => e.id === state.currentEventId);
-    const evEntries = (state.entries || []).filter(e => e.eventId === state.currentEventId);
-    if (!currentEvent || evEntries.length === 0) {
-      alert('出力するデータがありません');
+  function exportCSV(mode) {
+    const targetEventId = mode === 'special' ? state.currentSpecialEventId : state.currentNormalEventId;
+    const currentEvent = (state.events || []).find(e => e.id === targetEventId);
+    if (!currentEvent) {
+      alert('出力するイベントがありません');
       return;
     }
-    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\nメンバー名,チーム名,区分,メモ,金額\n`;
-    evEntries.forEach(e => {
-      csvStr += `"${e.memberName}","${e.teamName || ''}","${e.type}","${e.memo || ''}",${e.amount}\n`;
-    });
+
+    let csvStr = `イベント: ${currentEvent.name}, 日付: ${currentEvent.date}\n`;
+
+    if (mode === 'special') {
+      const evEntries = (state.entries || []).filter(e => e.eventId === targetEventId);
+      csvStr += `品名,区分,メモ,金額\n`;
+      evEntries.forEach(e => {
+        const amt = (e.type === '特別費支出') ? -e.amount : e.amount;
+        csvStr += `"${e.itemName || ''}","${e.type}","${e.memo || ''}",${amt}\n`;
+      });
+    } else {
+      csvStr += `#,メンバー名,チーム名,参加費,駐車場代,購入物立替,差引精算額,受領状態\n`;
+      const stData = (state.eventSettlements && state.eventSettlements[targetEventId]) ? state.eventSettlements[targetEventId] : {};
+      let idx = 1;
+      (state.members || []).forEach(m => {
+        const mData = stData[m] || { fee: 0, parking: 0, purchase: 0, paid: false, excluded: false };
+        if (mData.excluded) return;
+        const team = (state.memberTeams && state.memberTeams[m]) ? state.memberTeams[m] : 'Aチーム';
+        const net = (mData.fee || 0) + (mData.parking || 0) - (mData.purchase || 0);
+        csvStr += `${idx++},"${m}","${team}",${mData.fee || 0},${mData.parking || 0},${mData.purchase || 0},${net},"${mData.paid ? '受領済' : '未'}"\n`;
+      });
+    }
 
     const blob = new Blob([new Uint8Array([0xEF, 0xBB, 0xBF]), csvStr], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
@@ -724,7 +932,7 @@
 
   function clearAllData() {
     if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
-      state = { members: [], events: [], entries: [], currentEventId: null };
+      state = { members: [], memberTeams: {}, eventSettlements: {}, events: [], entries: [], currentNormalEventId: null, currentSpecialEventId: null };
       saveData();
     }
   }
