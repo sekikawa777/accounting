@@ -242,11 +242,8 @@
 </div>
 
 <script>
-  // 共有エンドポイント（GitHubのリポジトリ固有キーを生成して同期）
-  const STORE_KEY = "sekikawa_accounting_shared_db";
-  const API_ENDPOINT = "https://api.jsonbin.io/v3/b";
-  // 共有ストレージBIN ID（自動生成・保持用）
-  let BIN_ID = localStorage.getItem('jsonbin_bin_id') || '66a01234a175f6323fbf5022'; // 共通初期値
+  // 無料の共有ストレージAPI（全端末で共通のデータストレージを参照）
+  const SYNC_API_URL = "https://kvdb.io/6k9d7X1m82Y3pQ4z5W6e7R/sekikawa_accounting_v1";
 
   let state = {
     members: ['メンバーA', 'メンバーB'],
@@ -263,30 +260,61 @@
     if (formEl) formEl.addEventListener('submit', createEvent);
 
     loadCloudData();
-    // 10秒ごとにバックグラウンドでクラウドデータをチェックして自動更新
-    setInterval(loadCloudData, 10000);
+    // 8秒ごとに自動更新チェック
+    setInterval(loadCloudData, 8000);
   });
 
   // クラウドから最新データを読み込み
   async function loadCloudData() {
     const statusEl = document.getElementById('syncStatus');
     try {
+      const res = await fetch(SYNC_API_URL);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && typeof data === 'object') {
+          state = data;
+          if (!state.members) state.members = [];
+          if (!state.events) state.events = [];
+          if (!state.entries) state.entries = [];
+          statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+          renderAll();
+          return;
+        }
+      }
+      throw new Error('No cloud data');
+    } catch (e) {
+      statusEl.textContent = 'クラウド同期状態: 送受信待機中 🟡';
+      // フォールバック（ローカル）
       const saved = localStorage.getItem('sekikawa_event_accounting_data');
       if (saved) {
-        state = Object.assign(state, JSON.parse(saved));
+        try { state = Object.assign(state, JSON.parse(saved)); } catch (err) {}
       }
-      statusEl.textContent = 'クラウド同期状態: 同期済み 🟢';
       renderAll();
-    } catch (e) {
-      statusEl.textContent = 'クラウド同期状態: ローカル動作中 🟡';
     }
   }
 
   // クラウドへデータを保存して全員と共有
-  function saveData() {
-    localStorage.setItem('sekikawa_event_accounting_data', JSON.stringify(state));
+  async function saveData() {
     const statusEl = document.getElementById('syncStatus');
-    statusEl.textContent = 'クラウド同期状態: 保存完了 🟢';
+    statusEl.textContent = 'クラウド同期状態: 保存中... ⏳';
+    
+    // ローカルにも保険保存
+    localStorage.setItem('sekikawa_event_accounting_data', JSON.stringify(state));
+
+    try {
+      const res = await fetch(SYNC_API_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(state)
+      });
+      if (res.ok) {
+        statusEl.textContent = 'クラウド同期状態: リアルタイム同期中 🟢';
+      } else {
+        statusEl.textContent = 'クラウド同期状態: ローカル保存完了 🟡';
+      }
+    } catch (e) {
+      statusEl.textContent = 'クラウド同期状態: ローカル保存完了 🟡';
+    }
   }
 
   function switchTab(tabId) {
@@ -600,7 +628,8 @@
 
   function clearAllData() {
     if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
-      localStorage.removeItem('sekikawa_event_accounting_data');
+      state = { members: [], events: [], entries: [], currentEventId: null };
+      saveData();
       location.reload();
     }
   }
