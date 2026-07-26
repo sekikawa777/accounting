@@ -250,17 +250,17 @@
   let state = {
     initialBalance: 0,
     members: ['メンバーA', 'メンバーB'],
-    events: [], // { id, name, date }
-    entries: [], // { id, eventId, memberName, type, amount, memo }
+    events: [],
+    entries: [],
     currentEventId: null
   };
 
   document.addEventListener('DOMContentLoaded', () => {
-    // 今日の日付を初期値にセット
-    document.getElementById('newEventDate').valueAsDate = new Date();
+    const dateEl = document.getElementById('newEventDate');
+    if (dateEl) dateEl.valueAsDate = new Date();
     
-    // イベント作成フォームのリスナー設定
-    document.getElementById('createEventForm').addEventListener('submit', createEvent);
+    const formEl = document.getElementById('createEventForm');
+    if (formEl) formEl.addEventListener('submit', createEvent);
 
     loadData();
     renderAll();
@@ -280,7 +280,6 @@
       }
     }
     
-    // イベントが全く無い場合の初期サンプル
     if (!state.events || state.events.length === 0) {
       const defaultId = 'e_' + Date.now();
       const today = new Date().toISOString().slice(0,10);
@@ -290,7 +289,8 @@
       state.currentEventId = state.events[0].id;
     }
 
-    document.getElementById('initialBalance').value = state.initialBalance || 0;
+    const initEl = document.getElementById('initialBalance');
+    if (initEl) initEl.value = state.initialBalance || 0;
   }
 
   function switchTab(tabId) {
@@ -319,7 +319,6 @@
     updateCalculations();
   }
 
-  /* --- イベント作成 & 管理 --- */
   function createEvent(e) {
     e.preventDefault();
     const nameInput = document.getElementById('newEventName');
@@ -340,7 +339,6 @@
     saveData();
     nameInput.value = '';
     
-    // 作成後に「明細入力・詳細」タブへ自動切り替え
     switchTab('entryView');
   }
 
@@ -362,9 +360,9 @@
     switchTab('entryView');
   }
 
-  /* --- イベント別収支一覧 (トップページ) --- */
   function renderEventStats() {
     const tbody = document.getElementById('eventStatsBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     if (!state.events || state.events.length === 0) {
@@ -400,9 +398,9 @@
     });
   }
 
-  /* --- 明細登録 & 一覧 --- */
   function renderEventSelect() {
     const sel = document.getElementById('activeEventSelect');
+    if (!sel) return;
     sel.innerHTML = '';
     
     const sortedEvents = [...state.events].sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -415,25 +413,30 @@
     });
 
     const memSel = document.getElementById('entryMemberSelect');
-    memSel.innerHTML = '';
-    state.members.forEach(m => {
-      const opt = document.createElement('option');
-      opt.value = m;
-      opt.textContent = m;
-      memSel.appendChild(opt);
-    });
+    if (memSel) {
+      memSel.innerHTML = '';
+      state.members.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m;
+        opt.textContent = m;
+        memSel.appendChild(opt);
+      });
+    }
 
-    // 見出し変更
     const curEv = state.events.find(e => e.id === state.currentEventId);
-    if (curEv) {
-      document.getElementById('entrySectionTitle').textContent = `明細の追加（${curEv.name}）`;
+    const titleEl = document.getElementById('entrySectionTitle');
+    if (curEv && titleEl) {
+      titleEl.textContent = `明細の追加（${curEv.name}）`;
     }
   }
 
   function onActiveEventChange() {
-    state.currentEventId = document.getElementById('activeEventSelect').value;
-    saveData();
-    renderAll();
+    const sel = document.getElementById('activeEventSelect');
+    if (sel) {
+      state.currentEventId = sel.value;
+      saveData();
+      renderAll();
+    }
   }
 
   function addEntry(e) {
@@ -465,6 +468,7 @@
 
   function renderEntries() {
     const tbody = document.getElementById('entriesTableBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     const eventEntries = state.entries.filter(e => e.eventId === state.currentEventId);
@@ -491,13 +495,15 @@
     });
   }
 
-  /* --- イベント別精算 --- */
   function renderMemberSummary() {
     const currentEvent = state.events.find(e => e.id === state.currentEventId);
     const title = document.getElementById('summaryTitle');
-    title.textContent = currentEvent ? `イベント別精算：${currentEvent.name} (${currentEvent.date})` : 'イベント別精算';
+    if (title) {
+      title.textContent = currentEvent ? `イベント別精算：${currentEvent.name} (${currentEvent.date})` : 'イベント別精算';
+    }
 
     const tbody = document.getElementById('memberSummaryBody');
+    if (!tbody) return;
     tbody.innerHTML = '';
 
     const summary = {};
@@ -528,7 +534,6 @@
     });
   }
 
-  /* --- メンバーマスター --- */
   function addMasterMember(e) {
     e.preventDefault();
     const input = document.getElementById('newMemberName');
@@ -551,6 +556,7 @@
 
   function renderMemberMaster() {
     const container = document.getElementById('memberTagList');
+    if (!container) return;
     container.innerHTML = '';
     state.members.forEach(m => {
       const tag = document.createElement('div');
@@ -560,10 +566,12 @@
     });
   }
 
-  /* --- 集計 --- */
   function updateCalculations() {
-    state.initialBalance = parseInt(document.getElementById('initialBalance').value, 10) || 0;
-    saveData();
+    const initEl = document.getElementById('initialBalance');
+    if (initEl) {
+      state.initialBalance = parseInt(initEl.value, 10) || 0;
+      saveData();
+    }
 
     let totalEventNet = 0;
     state.entries.forEach(e => {
@@ -574,15 +582,18 @@
     const totalBalance = state.initialBalance + totalEventNet;
 
     const allEl = document.getElementById('allEventsBalance');
-    allEl.textContent = `¥${totalEventNet.toLocaleString()}`;
-    allEl.className = `card-value ${totalEventNet >= 0 ? 'plus' : 'minus'}`;
+    if (allEl) {
+      allEl.textContent = `¥${totalEventNet.toLocaleString()}`;
+      allEl.className = `card-value ${totalEventNet >= 0 ? 'plus' : 'minus'}`;
+    }
 
     const totalEl = document.getElementById('totalBalance');
-    totalEl.textContent = `¥${totalBalance.toLocaleString()}`;
-    totalEl.className = `card-value ${totalBalance >= 0 ? 'plus' : 'minus'}`;
+    if (totalEl) {
+      totalEl.textContent = `¥${totalBalance.toLocaleString()}`;
+      totalEl.className = `card-value ${totalBalance >= 0 ? 'plus' : 'minus'}`;
+    }
   }
 
-  /* --- CSV出力 --- */
   function exportCSV() {
     const currentEvent = state.events.find(e => e.id === state.currentEventId);
     const evEntries = state.entries.filter(e => e.eventId === state.currentEventId);
@@ -602,7 +613,6 @@
     link.click();
   }
 
-  /* --- リセット --- */
   function clearAllData() {
     if (confirm('すべてのイベントおよび明細データを初期化しますか？')) {
       localStorage.removeItem('event_accounting_v3');
@@ -612,6 +622,12 @@
 
   function escapeHtml(str) {
     return (str || '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
+  }
+</script>
+
+</body>
+</html>
+| '').replace(/[&<>"']/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[m]));
   }
 </script>
 
